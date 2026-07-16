@@ -56,6 +56,8 @@ export function serviceJsonLd(opts: {
   name: string;
   description: string;
   slug: string;
+  /** Full path override, e.g. "/home-services" (defaults to /services/<slug>). */
+  path?: string;
   offers?: { price: number; name: string }[];
 }) {
   return {
@@ -63,7 +65,7 @@ export function serviceJsonLd(opts: {
     "@type": "Service",
     name: opts.name,
     description: opts.description,
-    url: `${site.url}/services/${opts.slug}`,
+    url: `${site.url}${opts.path ?? `/services/${opts.slug}`}`,
     provider: { "@id": `${site.url}/#business` },
     areaServed: site.serviceArea.towns.map((town) => ({
       "@type": "City",
