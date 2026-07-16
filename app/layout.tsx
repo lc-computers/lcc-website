@@ -3,6 +3,7 @@ import { Public_Sans, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ChatLauncher } from "@/components/chat/ChatLauncher";
 import { JsonLd } from "@/components/JsonLd";
 import { localBusinessJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main-content">{children}</main>
         <Footer />
+        <ChatLauncher />
         <JsonLd data={localBusinessJsonLd()} />
         <Analytics />
       </body>
