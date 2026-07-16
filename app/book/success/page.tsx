@@ -1,0 +1,111 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { eq } from "drizzle-orm";
+import { CheckCircle2, Clock3 } from "lucide-react";
+import { Container } from "@/components/ui/Container";
+import { ButtonLink } from "@/components/ui/Button";
+import { PhoneLink } from "@/components/ui/PhoneLink";
+import { getDb, hasDb } from "@/lib/db";
+import { bookings } from "@/lib/db/schema";
+import { getResidentialService, site } from "@/lib/site";
+import { formatDateTime, formatMoney } from "@/lib/format";
+
+export const metadata: Metadata = {
+  title: "Booking Confirmed",
+  robots: { index: false },
+};
+
+export const dynamic = "force-dynamic";
+
+async function loadBooking(sessionId: string) {
+  if (!hasDb()) return null;
+  const db = getDb();
+  // The Stripe webhook usually lands within a second or two of redirect —
+  // wait briefly so most customers see the fully confirmed state.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const [row] = await db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.stripeSessionId, sessionId));
+    if (row?.status === "confirmed") return row;
+    if (attempt < 3) await new Promise((r) => setTimeout(r, 1200));
+  }
+  const [row] = await db.select().from(bookings).where(eq(bookings.stripeSessionId, sessionId));
+  return row ?? null;
+}
+
+export default async function BookingSuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string }>;
+}) {
+  const { session_id: sessionId } = await searchParams;
+  const booking = sessionId ? await loadBooking(sessionId) : null;
+  const service = booking ? getResidentialService(booking.serviceSlug) : null;
+  const confirmed = booking?.status === "confirmed";
+
+  return (
+    <section className="py-16 sm:py-24">
+      <Container>
+        <div className="mx-auto max-w-xl rounded-lg border border-cream-200 bg-white p-8 text-center shadow-card sm:p-10">
+          {confirmed ? (
+            <CheckCircle2 className="mx-auto h-12 w-12 text-navy-600" aria-hidden="true" />
+          ) : (
+            <Clock3 className="mx-auto h-12 w-12 text-brass-500" aria-hidden="true" />
+          )}
+          <h1 className="mt-5 font-serif text-3xl font-semibold text-ink-900">
+            {confirmed ? "You're booked." : "Payment received."}
+          </h1>
+          {booking && service ? (
+            <>
+              <p className="mt-3 text-lg text-ink-700">
+                {service.name} — <strong>{formatDateTime(booking.startAt)}</strong>
+              </p>
+              <p className="mt-2 text-sm text-ink-500">
+                {formatMoney(booking.totalCents)} paid
+                {booking.travelFeeCents > 0
+                  ? ` (includes ${formatMoney(booking.travelFeeCents)} travel fee)`
+                  : ""}
+                .
+              </p>
+              {confirmed ? (
+                <p className="mt-4 text-base text-ink-700">
+                  Your confirmation email is on its way with a calendar invite
+                  {booking.smsConsent ? " — and a text is headed to your phone" : ""}. Need to
+                  change anything?{" "}
+                  <Link
+                    href={`/book/manage/${booking.manageToken}`}
+                    className="font-semibold text-navy-700 underline underline-offset-4"
+                  >
+                    Manage your booking
+                  </Link>
+                  .
+                </p>
+              ) : (
+                <p className="mt-4 text-base text-ink-700">
+                  We&apos;re finalizing your confirmation now — it lands in your inbox within a
+                  couple of minutes, calendar invite included.
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="mt-4 text-base text-ink-700">
+              Your payment went through and your confirmation email is on its way. If it
+              hasn&apos;t arrived within a few minutes, call us and we&apos;ll sort it instantly.
+            </p>
+          )}
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <ButtonLink href="/" variant="secondary">
+              Back to the homepage
+            </ButtonLink>
+            <p className="text-sm text-ink-500">
+              Questions?{" "}
+              <PhoneLink location="book_success" className="font-bold text-navy-700" /> —{" "}
+              {site.hours.short}.
+            </p>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
