@@ -17,6 +17,30 @@ export const BUSINESS = {
 
 export const FULL_ADDRESS = `${BUSINESS.street}, ${BUSINESS.city}, ${BUSINESS.state} ${BUSINESS.zip}`;
 
+/**
+ * Google Business Profile / review link. Set to the real profile URL
+ * (e.g. https://g.page/r/.../review) to enable "Review us on Google"
+ * buttons and the sameAs schema entry. Leave null to hide them.
+ */
+export const GOOGLE_BUSINESS_PROFILE_URL: string | null = null;
+
+export interface Testimonial {
+  quote: string;
+  /** Customer name or descriptor, e.g. "Sarah M." */
+  name: string;
+  /** e.g. "Retail store owner, Somerset" */
+  detail: string;
+}
+
+/**
+ * Real customer quotes only — never invent these. The testimonials
+ * section renders on the home page only when this array is non-empty.
+ * Shape example:
+ * { quote: "They had our office back online the same morning.",
+ *   name: "Jane D.", detail: "Office manager, Somerset" }
+ */
+export const TESTIMONIALS: Testimonial[] = [];
+
 export interface Service {
   slug: string;
   /** Short name used in nav, cards, and footer links */

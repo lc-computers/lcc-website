@@ -88,6 +88,11 @@ export default function Footer() {
                 All Service Areas
               </Link>
             </li>
+            <li>
+              <Link href="/blog" className="text-slate-600 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400">
+                Blog
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

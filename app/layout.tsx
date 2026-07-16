@@ -1,10 +1,16 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
-import { BUSINESS, CITIES, SITE_URL } from "@/lib/site-data";
+import {
+  BUSINESS,
+  CITIES,
+  GOOGLE_BUSINESS_PROFILE_URL,
+  SITE_URL,
+} from "@/lib/site-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +70,7 @@ const localBusinessSchema = {
     "@type": "City",
     name: `${c.name}, KY`,
   })),
+  ...(GOOGLE_BUSINESS_PROFILE_URL ? { sameAs: [GOOGLE_BUSINESS_PROFILE_URL] } : {}),
 };
 
 export default function RootLayout({
@@ -81,6 +88,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

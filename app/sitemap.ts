@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
+import { POSTS } from "@/lib/posts";
 import { CITIES, SERVICES, SITE_URL } from "@/lib/site-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/services", "/service-areas", "/about", "/contact"].map(
+  const staticRoutes = ["", "/services", "/service-areas", "/about", "/contact", "/blog"].map(
     (path) => ({
       url: `${SITE_URL}${path}`,
       changeFrequency: "monthly" as const,
@@ -22,5 +23,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...serviceRoutes, ...cityRoutes];
+  const postRoutes = POSTS.map((p) => ({
+    url: `${SITE_URL}/blog/${p.slug}`,
+    lastModified: new Date(p.date),
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...serviceRoutes, ...cityRoutes, ...postRoutes];
 }

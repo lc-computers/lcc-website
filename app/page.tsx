@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Cta from "@/components/Cta";
+import Testimonials from "@/components/Testimonials";
 import { BUSINESS, CITIES, SERVICES } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -100,6 +101,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <Testimonials />
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">

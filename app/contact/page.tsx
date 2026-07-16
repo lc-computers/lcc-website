@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BUSINESS, CITIES, FULL_ADDRESS } from "@/lib/site-data";
+import {
+  BUSINESS,
+  CITIES,
+  FULL_ADDRESS,
+  GOOGLE_BUSINESS_PROFILE_URL,
+} from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -68,6 +73,34 @@ export default function ContactPage() {
           </a>
         </div>
       </div>
+
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Find us
+        </h2>
+        <div className="mt-5 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
+          <iframe
+            title={`Map to ${BUSINESS.name}, ${FULL_ADDRESS}`}
+            src={`https://www.google.com/maps?q=${encodeURIComponent(
+              `${BUSINESS.name}, ${FULL_ADDRESS}`
+            )}&output=embed`}
+            className="h-96 w-full border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        </div>
+        {GOOGLE_BUSINESS_PROFILE_URL && (
+          <a
+            href={GOOGLE_BUSINESS_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-block rounded-md border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+          >
+            Review us on Google →
+          </a>
+        )}
+      </section>
 
       <section className="mt-12">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">

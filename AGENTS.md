@@ -39,5 +39,5 @@ All content for service and city pages is data-driven from `lib/site-data.ts` �
 # Phases
 
 - **Phase 1 (done):** all pages above + local SEO foundations.
-- **Phase 2:** real photography/branding, testimonials, Google Business Profile integration, map embed, analytics.
-- **Phase 3:** blog/resources for content SEO.
+- **Phase 2 (done, pending owner inputs):** brand OG image + icon, testimonials infrastructure (`TESTIMONIALS` in `lib/site-data.ts` — renders only when populated with REAL quotes; never invent them), Google Business Profile hooks (`GOOGLE_BUSINESS_PROFILE_URL` — set to enable review buttons + sameAs schema), Google Maps embed on contact, Vercel Analytics. Still owner-supplied: real photography, real testimonial quotes, GBP URL.
+- **Phase 3 (done):** blog at `/blog` — posts live in `lib/posts.tsx` (JSX bodies, BlogPosting + BreadcrumbList schema, in sitemap). Add new posts there.
