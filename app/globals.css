@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+/*
+ * Lake Cumberland Computers — design tokens.
+ * Institutional and calm: deep navy on warm off-white, one restrained brass
+ * accent. Two typefaces (Source Serif 4 for headings, Public Sans for body).
+ * These tokens are the entire palette and scale — do not add one-off values.
+ */
+@theme {
+  /* Navy — primary (#0C447C family) */
+  --color-navy-50: #f2f6fb;
+  --color-navy-100: #e2ebf5;
+  --color-navy-200: #c3d6ea;
+  --color-navy-300: #97b7d9;
+  --color-navy-400: #6392c4;
+  --color-navy-500: #3d71a8;
+  --color-navy-600: #1f568f;
+  --color-navy-700: #0c447c;
+  --color-navy-800: #0b3765;
+  --color-navy-900: #0a2c50;
+  --color-navy-950: #071d36;
+
+  /* Warm off-white surfaces */
+  --color-cream-50: #fbf9f5;
+  --color-cream-100: #f5f1e9;
+  --color-cream-200: #eae3d5;
+  --color-cream-300: #d9cfba;
+
+  /* Brass — the single restrained accent */
+  --color-brass-300: #d9bc7e;
+  --color-brass-400: #c9a55a;
+  --color-brass-500: #b08d3e;
+  --color-brass-600: #93712b;
+  --color-brass-700: #6d5316;
+
+  /* Ink — text */
+  --color-ink-900: #16202e;
+  --color-ink-700: #2e3d51;
+  --color-ink-500: #4c5d76;
+
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+
+  /* Type scale — the only sizes used anywhere on the site */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.8rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.85rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.3rem;
+  --text-4xl: 2.375rem;
+  --text-4xl--line-height: 2.8rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 3.35rem;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 4.05rem;
+
+  --shadow-card: 0 1px 2px rgb(7 29 54 / 0.05), 0 4px 16px rgb(7 29 54 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(7 29 54 / 0.06), 0 10px 28px rgb(7 29 54 / 0.1);
+}
+
+/* ————— Base ————— */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-cream-50);
+  color: var(--color-ink-700);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  color: var(--color-ink-900);
+  text-wrap: balance;
+}
+
+::selection {
+  background-color: var(--color-navy-700);
+  color: var(--color-cream-50);
+}
+
+/* Visible, consistent keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-navy-600);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ————— Reusable pieces ————— */
+
+/* Eyebrow label above section headings */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brass-600);
+}
+
+@utility eyebrow-light {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brass-300);
+}
+
+/* Subtle scroll reveal — no movement for reduced-motion users */
+@utility reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Long-form article/legal prose */
+@utility prose-site {
+  & h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+    margin-top: 2.5rem;
+    margin-bottom: 0.875rem;
+  }
+  & h3 {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  & p {
+    margin-bottom: 1.15rem;
+  }
+  & ul,
+  & ol {
+    margin-bottom: 1.15rem;
+    padding-left: 1.4rem;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li {
+    margin-bottom: 0.4rem;
+    padding-left: 0.2rem;
+  }
+  & a {
+    color: var(--color-navy-700);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-navy-300);
+  }
+  & a:hover {
+    text-decoration-color: var(--color-navy-700);
+  }
+  & strong {
+    color: var(--color-ink-900);
+    font-weight: 600;
+  }
+  & blockquote {
+    border-left: 3px solid var(--color-brass-400);
+    padding-left: 1.25rem;
+    font-style: italic;
+    margin-bottom: 1.15rem;
+    color: var(--color-ink-500);
+  }
+  & code {
+    background: var(--color-cream-100);
+    border: 1px solid var(--color-cream-200);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.9em;
+  }
+  & hr {
+    border-color: var(--color-cream-200);
+    margin: 2.5rem 0;
+  }
+}
