@@ -132,17 +132,23 @@ export default async function AdminPage({
         </p>
       ) : null}
 
-      {/* Stats */}
+      {/* Stats — tiles link to the detail views */}
       <dl className="mt-8 grid grid-cols-3 gap-4">
         {[
-          { label: "Leads", value: counts?.leads ?? 0 },
-          { label: "Paid bookings", value: counts?.bookings ?? 0 },
-          { label: "Health checks", value: counts?.healthChecks ?? 0 },
+          { label: "Leads", value: counts?.leads ?? 0, href: "/admin/leads" },
+          { label: "Bookings", value: counts?.bookings ?? 0, href: "/admin/bookings" },
+          { label: "Health checks", value: counts?.healthChecks ?? 0, href: "/admin/leads" },
         ].map((s) => (
-          <div key={s.label} className="rounded-lg border border-cream-200 bg-white p-4 text-center shadow-card">
+          <Link
+            key={s.label}
+            href={s.href}
+            className="rounded-lg border border-cream-200 bg-white p-4 text-center shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover motion-reduce:hover:translate-y-0"
+          >
             <dd className="font-serif text-3xl font-semibold text-navy-700">{s.value}</dd>
-            <dt className="mt-1 text-xs font-bold uppercase tracking-wider text-ink-500">{s.label}</dt>
-          </div>
+            <dt className="mt-1 text-xs font-bold uppercase tracking-wider text-ink-500">
+              {s.label} →
+            </dt>
+          </Link>
         ))}
       </dl>
 
