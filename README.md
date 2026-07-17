@@ -236,7 +236,9 @@ async redirects() {
    link, confirm the automatic refund in Stripe.
 4. Flip DNS at GoDaddy (table above). Verify https://lakecumberlandcomputers.com
    serves the new site and **send/receive a test email** to confirm mail flow
-   untouched.
+   untouched. Then update `NEXT_PUBLIC_SITE_URL` in Vercel to
+   `https://lakecumberlandcomputers.com` (it points at the vercel.app URL
+   until cutover) and redeploy — this fixes canonicals and email links.
 5. Verify the Stripe webhook endpoint points at the production domain.
 6. Google Business Profile: align NAP exactly — Lake Cumberland Computers,
    478 Lakeway Dr, Russell Springs, KY 42642, (270) 866-8660 — and set the
