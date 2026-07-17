@@ -146,21 +146,22 @@ export async function refundBookingPayment(booking: BookingRow): Promise<boolean
   }
 }
 
-/** Race-loss path: refund, mark refunded, apologize. */
+/** Race-loss path: refund, mark honestly, apologize. */
 export async function loseRace(db: Db, booking: BookingRow): Promise<void> {
   const service = serviceForBooking(booking);
   const refunded = await refundBookingPayment(booking);
   await db
     .update(bookings)
     .set({
-      status: "refunded",
+      // Only claim "refunded" when the refund actually went through.
+      status: refunded ? "refunded" : "canceled",
       canceledAt: new Date(),
       refundedAt: refunded ? new Date() : null,
       updatedAt: new Date(),
     })
     .where(eq(bookings.id, booking.id));
   await db.delete(bookingHolds).where(eq(bookingHolds.bookingId, booking.id));
-  const email = raceApologyEmail(booking, service);
+  const email = raceApologyEmail(booking, service, refunded);
   await sendEmail({ to: booking.email, subject: email.subject, html: email.html });
   await notifyLead({
     source: "Booking",

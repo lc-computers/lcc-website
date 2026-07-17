@@ -73,9 +73,16 @@ export async function POST(req: Request) {
         break;
     }
   } catch (err) {
-    // Ack anyway: our idempotency row exists, and retrying without it being
-    // cleared would be skipped. Log loudly for follow-up.
+    // Release the idempotency row and ask Stripe to retry — a transient
+    // failure here must never strand a paid booking. Sequential retries are
+    // safe: handleCompleted re-checks booking status before acting.
     console.error(`webhook: handler for ${event.type} failed`, err);
+    try {
+      await db.delete(stripeEvents).where(eq(stripeEvents.id, event.id));
+    } catch (cleanupErr) {
+      console.error("webhook: failed to release idempotency row", cleanupErr);
+    }
+    return NextResponse.json({ error: "Handler failed — retry" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

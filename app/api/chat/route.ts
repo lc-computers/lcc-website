@@ -1,7 +1,7 @@
 import { NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb, hasDb } from "@/lib/db";
 import { chatSessions, leads } from "@/lib/db/schema";
 import { buildChatSystemPrompt } from "@/lib/prompts/chat";
@@ -17,7 +17,10 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const CHAT_MODEL = "claude-sonnet-5";
-const MAX_HISTORY = 24;
+/** Messages sent to the model per turn (persistence keeps more). */
+const MODEL_CONTEXT = 24;
+/** Messages retained in the stored transcript. */
+const STORED_LIMIT = 60;
 
 const bodySchema = z.object({
   sessionKey: z.string().min(10).max(64).regex(/^[\w-]+$/),
@@ -30,7 +33,7 @@ const bodySchema = z.object({
         content: z.string().max(4000),
       })
     )
-    .max(MAX_HISTORY)
+    .max(MODEL_CONTEXT)
     .optional(),
 });
 
@@ -69,9 +72,8 @@ export async function POST(req: Request) {
   }
 
   // Load or create the server-side transcript (source of truth when DB exists)
-  let history: ChatMessage[] = [];
+  let fullHistory: ChatMessage[] = [];
   let sessionId: string | null = null;
-  let leadAlreadyCaptured = false;
   if (hasDb()) {
     try {
       const db = getDb();
@@ -81,8 +83,7 @@ export async function POST(req: Request) {
         .where(eq(chatSessions.sessionKey, sessionKey));
       if (existing) {
         sessionId = existing.id;
-        history = existing.messages.slice(-MAX_HISTORY);
-        leadAlreadyCaptured = existing.leadCaptured;
+        fullHistory = existing.messages;
       } else {
         const [created] = await db
           .insert(chatSessions)
@@ -97,15 +98,14 @@ export async function POST(req: Request) {
             .from(chatSessions)
             .where(eq(chatSessions.sessionKey, sessionKey));
           sessionId = raced?.id ?? null;
-          history = raced?.messages.slice(-MAX_HISTORY) ?? [];
-          leadAlreadyCaptured = raced?.leadCaptured ?? false;
+          fullHistory = raced?.messages ?? [];
         }
       }
     } catch (err) {
       console.error("chat: session load failed (continuing stateless)", err);
     }
   } else if (parsed.data.history) {
-    history = parsed.data.history.map((m) => ({ ...m, at: new Date().toISOString() }));
+    fullHistory = parsed.data.history.map((m) => ({ ...m, at: new Date().toISOString() }));
   }
 
   const userMessage: ChatMessage = {
@@ -113,10 +113,11 @@ export async function POST(req: Request) {
     content: message,
     at: new Date().toISOString(),
   };
-  const context = [...history, userMessage];
+  const modelContext = [...fullHistory, userMessage].slice(-MODEL_CONTEXT);
 
   const anthropic = new Anthropic();
   let assistantText = "";
+  let clientGone = false;
   let resolveDone!: () => void;
   const done = new Promise<void>((resolve) => {
     resolveDone = resolve;
@@ -130,23 +131,43 @@ export async function POST(req: Request) {
           model: CHAT_MODEL,
           max_tokens: 700,
           system: buildChatSystemPrompt(),
-          messages: context.map((m) => ({ role: m.role, content: m.content })),
+          messages: modelContext.map((m) => ({ role: m.role, content: m.content })),
         });
         runner.on("text", (text) => {
           assistantText += text;
-          controller.enqueue(encoder.encode(text));
+          if (clientGone) return;
+          try {
+            controller.enqueue(encoder.encode(text));
+          } catch {
+            clientGone = true; // client disconnected mid-stream
+          }
         });
         await runner.finalMessage();
       } catch (err) {
         console.error("chat: stream failed", err);
         if (assistantText.length === 0) {
           assistantText = FALLBACK;
-          controller.enqueue(encoder.encode(FALLBACK));
+          if (!clientGone) {
+            try {
+              controller.enqueue(encoder.encode(FALLBACK));
+            } catch {
+              clientGone = true;
+            }
+          }
         }
       } finally {
-        controller.close();
+        // Resolve FIRST — close() throws if the client already canceled, and
+        // persistence below must run either way.
         resolveDone();
+        try {
+          controller.close();
+        } catch {
+          // stream already canceled by the client
+        }
       }
+    },
+    cancel() {
+      clientGone = true;
     },
   });
 
@@ -161,62 +182,80 @@ export async function POST(req: Request) {
         content: assistantText,
         at: new Date().toISOString(),
       };
-      const fullTranscript = [...context, assistantMessage];
+      const fullTranscript = [...fullHistory, userMessage, assistantMessage];
       if (sessionId) {
         await db
           .update(chatSessions)
           .set({
-            messages: fullTranscript.slice(-60),
+            messages: fullTranscript.slice(-STORED_LIMIT),
             lastActiveAt: new Date(),
             closedAt: null,
           })
           .where(eq(chatSessions.id, sessionId));
       }
 
-      if (!leadAlreadyCaptured) {
-        const extracted = await extractLead(
-          fullTranscript.map((m) => ({ role: m.role, content: m.content }))
-        );
-        if (extracted?.hasContactInfo && (extracted.email || extracted.phone)) {
-          await db.insert(leads).values({
-            name: extracted.name,
-            email: extracted.email,
-            phone: extracted.phone,
-            organization: extracted.organization,
-            source: "chat",
-            message: extracted.summary,
-            meta: { track: extracted.track, urgency: extracted.urgency, sessionKey },
-          });
-          if (sessionId) {
-            await db
-              .update(chatSessions)
-              .set({ leadCaptured: true, leadEmailSentAt: new Date() })
-              .where(eq(chatSessions.id, sessionId));
-          }
-          const transcriptHtml = fullTranscript
-            .slice(-16)
-            .map(
-              (m) =>
-                `<p style="margin:0 0 8px;"><strong>${m.role === "user" ? "Visitor" : "Assistant"}:</strong> ${escapeHtml(m.content)}</p>`
-            )
-            .join("");
-          await notifyLead({
-            source: "Chat agent",
-            subject: `Chat lead: ${extracted.name ?? extracted.email ?? extracted.phone}${extracted.urgency === "emergency" ? " — URGENT" : ""}`,
-            fields: {
-              Name: extracted.name,
-              Email: extracted.email,
-              Phone: extracted.phone,
-              Organization: extracted.organization,
-              Track: extracted.track,
-              Urgency: extracted.urgency,
-              Summary: extracted.summary,
-            },
-            bodyHtml: `<h2 style="font-family:Georgia,serif;font-size:18px;">Recent transcript</h2>${transcriptHtml}`,
-          });
-          await trackServer("chat_lead_captured", { track: extracted.track });
-        }
+      if (!sessionId) return;
+
+      // Atomically claim lead capture for this session so overlapping turns
+      // can never double-extract or double-notify.
+      const claimed = await db
+        .update(chatSessions)
+        .set({ leadCaptured: true })
+        .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.leadCaptured, false)))
+        .returning({ id: chatSessions.id });
+      if (claimed.length === 0) return; // already captured (or being captured)
+
+      const extracted = await extractLead(
+        fullTranscript.map((m) => ({ role: m.role, content: m.content }))
+      );
+      if (!extracted?.hasContactInfo || (!extracted.email && !extracted.phone)) {
+        // Nothing captured yet — release the claim for future turns.
+        await db
+          .update(chatSessions)
+          .set({ leadCaptured: false })
+          .where(eq(chatSessions.id, sessionId));
+        return;
       }
+
+      await db.insert(leads).values({
+        name: extracted.name,
+        email: extracted.email,
+        phone: extracted.phone,
+        organization: extracted.organization,
+        source: "chat",
+        message: extracted.summary,
+        meta: { track: extracted.track, urgency: extracted.urgency, sessionKey },
+      });
+      const transcriptHtml = fullTranscript
+        .slice(-16)
+        .map(
+          (m) =>
+            `<p style="margin:0 0 8px;"><strong>${m.role === "user" ? "Visitor" : "Assistant"}:</strong> ${escapeHtml(m.content)}</p>`
+        )
+        .join("");
+      const sent = await notifyLead({
+        source: "Chat agent",
+        subject: `Chat lead: ${extracted.name ?? extracted.email ?? extracted.phone}${extracted.urgency === "emergency" ? " — URGENT" : ""}`,
+        fields: {
+          Name: extracted.name,
+          Email: extracted.email,
+          Phone: extracted.phone,
+          Organization: extracted.organization,
+          Track: extracted.track,
+          Urgency: extracted.urgency,
+          Summary: extracted.summary,
+        },
+        bodyHtml: `<h2 style="font-family:Georgia,serif;font-size:18px;">Recent transcript</h2>${transcriptHtml}`,
+      });
+      if (sent.ok) {
+        // Only stamp on real delivery — otherwise the chat-closeout cron's
+        // safety net re-sends the summary at session close.
+        await db
+          .update(chatSessions)
+          .set({ leadEmailSentAt: new Date() })
+          .where(eq(chatSessions.id, sessionId));
+      }
+      await trackServer("chat_lead_captured", { track: extracted.track });
     } catch (err) {
       console.error("chat: post-turn processing failed", err);
     }

@@ -99,15 +99,15 @@ export function SlotPicker({
         All times are Central Time. Pick a day, then a start time.
       </p>
       <div
-        role="tablist"
+        role="group"
         aria-label="Available days"
         className="mt-4 flex gap-2 overflow-x-auto pb-2"
       >
         {days.map((day) => (
           <button
             key={day.date}
-            role="tab"
-            aria-selected={day.date === active?.date}
+            type="button"
+            aria-pressed={day.date === active?.date}
             onClick={() => setActiveDay(day.date)}
             className={`shrink-0 rounded-md border px-4 py-2.5 text-sm font-semibold transition-colors ${
               day.date === active?.date
@@ -125,6 +125,7 @@ export function SlotPicker({
           return (
             <button
               key={slot.start}
+              type="button"
               onClick={() =>
                 onSelect({ start: slot.start, slotLabel: slot.label, dayLabel: active.label })
               }

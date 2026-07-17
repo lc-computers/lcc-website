@@ -34,17 +34,19 @@ export async function closeStaleChatSessions(db: Db): Promise<Record<string, num
               `<p style="margin:0 0 8px;"><strong>${m.role === "user" ? "Visitor" : "Assistant"}:</strong> ${escapeHtml(m.content)}</p>`
           )
           .join("");
-        await notifyLead({
+        const sent = await notifyLead({
           source: "Chat agent",
           subject: "Chat lead (captured at session close)",
           fields: { "Session started": session.createdAt.toISOString() },
           bodyHtml: `<h2 style="font-family:Georgia,serif;font-size:18px;">Transcript</h2>${transcript}`,
         });
-        await db
-          .update(chatSessions)
-          .set({ leadEmailSentAt: new Date() })
-          .where(eq(chatSessions.id, session.id));
-        counts.lead_emails = (counts.lead_emails ?? 0) + 1;
+        if (sent.ok) {
+          await db
+            .update(chatSessions)
+            .set({ leadEmailSentAt: new Date() })
+            .where(eq(chatSessions.id, session.id));
+          counts.lead_emails = (counts.lead_emails ?? 0) + 1;
+        }
       } catch (err) {
         console.error(`chat-closeout: lead email failed for ${session.id}`, err);
       }

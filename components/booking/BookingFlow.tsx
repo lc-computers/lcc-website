@@ -44,6 +44,8 @@ export function BookingFlow({ preselect, canceled }: { preselect?: string; cance
   const [slot, setSlot] = useState<SelectedSlot | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Hide the "no charge was made" note once the visitor moves toward paying again.
+  const dismissedCancelNotice = step === 4 && submitting;
 
   const fee = useMemo(
     () => (service ? travelFeeCents(service, details.city, details.zip) : 0),
@@ -145,7 +147,7 @@ export function BookingFlow({ preselect, canceled }: { preselect?: string; cance
         })}
       </ol>
 
-      {canceled && step === 1 ? (
+      {canceled && !dismissedCancelNotice ? (
         <p role="status" className="mt-5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium text-ink-900">
           No charge was made. Pick up where you left off whenever you&apos;re ready — or call{" "}
           {site.phone.display}.
@@ -396,7 +398,7 @@ function ServiceSummary({
       <p className="text-sm font-semibold text-ink-900">
         {service.name} — {service.priceDisplay}
       </p>
-      <button onClick={onChange} className="text-sm font-semibold text-navy-700 underline underline-offset-4 hover:text-navy-900">
+      <button type="button" onClick={onChange} className="text-sm font-semibold text-navy-700 underline underline-offset-4 hover:text-navy-900">
         Change
       </button>
     </div>
@@ -444,6 +446,7 @@ function Row({ label, value }: { label: string; value: string }) {
 function BackButton({ onClick, label = "Back" }: { onClick: () => void; label?: string }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-500 hover:text-navy-700"
     >

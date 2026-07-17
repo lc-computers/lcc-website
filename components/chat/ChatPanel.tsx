@@ -231,10 +231,16 @@ export function ChatPanel({ open, onClose }: { open: boolean; onClose: () => voi
         </div>
       </header>
 
+      {/* Announce only completed replies — announcing the streaming list
+          re-reads the growing bubble on every chunk. */}
+      <div className="sr-only" aria-live="polite" role="status">
+        {!streaming
+          ? [...messages].reverse().find((m) => m.role === "assistant" && m.content)?.content ?? ""
+          : ""}
+      </div>
       <div
         ref={listRef}
         className="flex-1 space-y-3 overflow-y-auto scroll-smooth px-4 py-4"
-        aria-live="polite"
       >
         <Bubble role="assistant">{renderMessage(GREETING)}</Bubble>
         {messages.map((m, i) => (

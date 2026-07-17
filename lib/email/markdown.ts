@@ -34,12 +34,31 @@ export function markdownToEmailHtml(md: string): string {
       continue;
     }
     if (/^[-*]\s+/m.test(trimmed)) {
-      const items = trimmed
-        .split("\n")
-        .filter((l) => /^[-*]\s+/.test(l.trim()))
-        .map((l) => `<li style="margin-bottom:6px;">${inline(l.trim().replace(/^[-*]\s+/, ""))}</li>`)
-        .join("");
-      html.push(`<ul style="margin:0 0 16px;padding-left:22px;">${items}</ul>`);
+      // Mixed blocks keep every line: consecutive bullets group into a list,
+      // any surrounding text lines render as paragraphs.
+      const lines = trimmed.split("\n");
+      let bullets: string[] = [];
+      const flush = () => {
+        if (bullets.length > 0) {
+          html.push(
+            `<ul style="margin:0 0 16px;padding-left:22px;">${bullets
+              .map((b) => `<li style="margin-bottom:6px;">${inline(b)}</li>`)
+              .join("")}</ul>`
+          );
+          bullets = [];
+        }
+      };
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) continue;
+        if (/^[-*]\s+/.test(t)) {
+          bullets.push(t.replace(/^[-*]\s+/, ""));
+        } else {
+          flush();
+          html.push(`<p style="margin:0 0 16px;">${inline(t)}</p>`);
+        }
+      }
+      flush();
       continue;
     }
     html.push(

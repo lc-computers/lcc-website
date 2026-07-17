@@ -74,10 +74,21 @@ export async function runNurtureQueue(db: Db): Promise<Record<string, number>> {
       if (result.ok) {
         counts.sent = (counts.sent ?? 0) + 1;
       } else {
+        // Release the claim so the next run retries instead of recording a
+        // failed send as delivered.
+        await db
+          .update(nurtureQueue)
+          .set({ sentAt: null })
+          .where(eq(nurtureQueue.id, item.id));
         counts.errors = (counts.errors ?? 0) + 1;
       }
     } catch (err) {
       console.error(`nurture: send failed for ${item.id}`, err);
+      try {
+        await db.update(nurtureQueue).set({ sentAt: null }).where(eq(nurtureQueue.id, item.id));
+      } catch {
+        // claim stays — better one lost retry than a double-send loop
+      }
       counts.errors = (counts.errors ?? 0) + 1;
     }
   }

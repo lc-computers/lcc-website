@@ -9,7 +9,13 @@ import { site } from "@/lib/site";
  */
 
 export function unsubscribeUrl(email: string): string {
-  return `${site.url}/unsubscribe?token=${encodeURIComponent(signEmailToken(email))}`;
+  const token = signEmailToken(email);
+  if (!token) {
+    // ADMIN_SECRET unset — fall back to a mailto unsubscribe (still CAN-SPAM
+    // compliant; handled by a human) instead of a forgeable link.
+    return `mailto:${site.email}?subject=${encodeURIComponent("Unsubscribe")}`;
+  }
+  return `${site.url}/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 
 export function nurtureDay3Email(to: string, firstName: string | null): {

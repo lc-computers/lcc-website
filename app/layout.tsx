@@ -47,6 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${publicSans.variable} ${sourceSerif.variable}`}>
       <body>
+        {/* Enables scroll-reveal initial states only when JS runs (see globals.css) */}
+        <script
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-navy-700 focus:px-4 focus:py-2 focus:text-cream-50"

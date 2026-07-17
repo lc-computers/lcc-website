@@ -13,7 +13,7 @@ export async function notifyLead(opts: {
   subject: string;
   fields: Record<string, string | null | undefined>;
   bodyHtml?: string;
-}): Promise<void> {
+}): Promise<{ ok: boolean }> {
   const rows = Object.entries(opts.fields)
     .filter(([, v]) => v)
     .map(
@@ -29,5 +29,5 @@ ${emailPanel(rows || "No fields captured")}
 ${opts.bodyHtml ?? ""}
 <p style="font-size:12px;color:#4C5D76;">Sent automatically by ${site.domain}.</p>`,
   });
-  await sendEmail({ to: leadNotifyAddress(), subject: opts.subject, html });
+  return sendEmail({ to: leadNotifyAddress(), subject: opts.subject, html });
 }

@@ -110,19 +110,30 @@ ${emailButton(`${site.url}/book`, "Book a new appointment")}
 
 export function raceApologyEmail(
   booking: BookingRow,
-  service: ResidentialService
+  service: ResidentialService,
+  refunded: boolean
 ): { subject: string; html: string } {
+  const refundLine = refunded
+    ? `<p><strong>Your ${formatMoney(booking.totalCents)} payment has already been refunded in full</strong> — nothing to do on your end. Depending on your bank it may take a few business days to appear.</p>`
+    : `<p><strong>We are issuing your ${formatMoney(booking.totalCents)} refund now.</strong> If it hasn't appeared within 2 business days, call ${site.phone.display} and we'll chase it down immediately.</p>`;
   const html = emailLayout({
-    preheader: "Your payment has been fully refunded — and we'd like to make this right.",
+    preheader: refunded
+      ? "Your payment has been fully refunded — and we'd like to make this right."
+      : "Your full refund is being issued — and we'd like to make this right.",
     bodyHtml: `
 ${emailHeading("We owe you an apology.")}
 <p>Two people booked the same ${escapeHtml(service.name)} slot within moments of each other, and the other booking finished payment first. That's our least favorite kind of coincidence, and we're sorry.</p>
-<p><strong>Your ${formatMoney(booking.totalCents)} payment has already been refunded in full</strong> — nothing to do on your end. Depending on your bank it may take a few business days to appear.</p>
+${refundLine}
 <p>The calendar shows live availability, so the time you pick next will be yours:</p>
 ${emailButton(`${site.url}/book?service=${service.slug}`, "Pick a new time")}
 <p>Or call ${site.phone.display} and we'll find you the next best slot ourselves — mention this email.</p>`,
   });
-  return { subject: `Our apology — that time slot was just taken (full refund issued)`, html };
+  return {
+    subject: refunded
+      ? "Our apology — that time slot was just taken (full refund issued)"
+      : "Our apology — that time slot was just taken (full refund on its way)",
+    html,
+  };
 }
 
 export function abandonedRecoveryEmail(

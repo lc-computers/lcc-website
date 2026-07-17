@@ -43,6 +43,36 @@ export default async function BookingSuccessPage({
   const booking = sessionId ? await loadBooking(sessionId) : null;
   const service = booking ? getResidentialService(booking.serviceSlug) : null;
   const confirmed = booking?.status === "confirmed";
+  const lostRace = booking?.status === "refunded" || booking?.status === "canceled";
+
+  if (booking && service && lostRace) {
+    return (
+      <section className="py-16 sm:py-24">
+        <Container>
+          <div className="mx-auto max-w-xl rounded-lg border border-cream-200 bg-white p-8 text-center shadow-card sm:p-10">
+            <Clock3 className="mx-auto h-12 w-12 text-brass-500" aria-hidden="true" />
+            <h1 className="mt-5 font-serif text-3xl font-semibold text-ink-900">
+              That slot was taken moments before you paid.
+            </h1>
+            <p className="mt-4 text-base text-ink-700">
+              We&apos;re sorry — two people booked the same time almost simultaneously, and the
+              other payment finished first. <strong>Your {formatMoney(booking.totalCents)} has
+              been refunded in full</strong> (details in your email; allow a few business days
+              for your bank).
+            </p>
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <ButtonLink href={`/book?service=${service.slug}`}>Pick a new time</ButtonLink>
+              <p className="text-sm text-ink-500">
+                Or call{" "}
+                <PhoneLink location="book_success_race" className="font-bold text-navy-700" /> and
+                we&apos;ll find you the next best slot ourselves.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 sm:py-24">

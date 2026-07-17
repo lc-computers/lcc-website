@@ -135,15 +135,17 @@ h4 {
   transform: none;
 }
 
+/* Initial hidden state only applies when JS is running (html.js is set by an
+   inline script in the layout) — content is never invisible without JS. */
 @media (prefers-reduced-motion: no-preference) {
-  .reveal {
+  html.js .reveal {
     opacity: 0;
     transform: translateY(14px);
     transition:
       opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .reveal.is-visible {
+  html.js .reveal.is-visible {
     opacity: 1;
     transform: none;
   }

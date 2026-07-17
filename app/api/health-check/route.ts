@@ -106,13 +106,19 @@ export async function POST(req: Request) {
 
         // Nurture: day 3 article, day 7 walkthrough (suppression is also
         // re-checked at send time; this avoids queueing for known opt-outs).
+        // Deduped: re-running the tool never multiplies the sequence.
         const [suppressed] = await db
           .select()
           .from(suppression)
           .where(eq(suppression.email, recipient));
         if (!suppressed) {
+          const existing = await db
+            .select({ templateKey: nurtureQueue.templateKey })
+            .from(nurtureQueue)
+            .where(eq(nurtureQueue.email, recipient));
+          const alreadyQueued = new Set(existing.map((r) => r.templateKey));
           const day = 24 * 60 * 60 * 1000;
-          await db.insert(nurtureQueue).values([
+          const toQueue = [
             {
               email: recipient,
               name: input.name,
@@ -127,7 +133,10 @@ export async function POST(req: Request) {
               sendAt: new Date(Date.now() + 7 * day),
               meta: { domain },
             },
-          ]);
+          ].filter((row) => !alreadyQueued.has(row.templateKey));
+          if (toQueue.length > 0) {
+            await db.insert(nurtureQueue).values(toQueue);
+          }
         }
       } catch (err) {
         console.error("health-check: persistence failed", err);

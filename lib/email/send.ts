@@ -60,7 +60,10 @@ export async function sendEmail(opts: SendEmailOptions): Promise<{ ok: boolean; 
       headers: opts.unsubscribeUrl
         ? {
             "List-Unsubscribe": `<${opts.unsubscribeUrl}>`,
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            // One-Click POST only applies to http(s) unsubscribe targets
+            ...(opts.unsubscribeUrl.startsWith("http")
+              ? { "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
+              : {}),
           }
         : undefined,
     });

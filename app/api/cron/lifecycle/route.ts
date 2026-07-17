@@ -20,8 +20,12 @@ export const maxDuration = 300;
  * instead — the routes are all idempotent (see README).
  */
 export async function GET(req: Request) {
+  // Fail closed: without CRON_SECRET this endpoint stays off entirely.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret) {
+    return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 503 });
+  }
+  if (req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!hasDb()) {

@@ -1,7 +1,7 @@
 import { and, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import type { Db } from "@/lib/db";
 import { bookings, bookingHolds } from "@/lib/db/schema";
-import { serviceForBooking } from "@/lib/booking/actions";
+import { loseRace, serviceForBooking } from "@/lib/booking/actions";
 import {
   abandonedRecoveryEmail,
   bookingReminderEmail,
@@ -25,13 +25,31 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
     .returning({ id: bookingHolds.id });
   counts.holds_expired = expiredHolds.length;
 
-  // 2. Stale pending_payment bookings (>72h old) → canceled.
-  const stale = await db
-    .update(bookings)
-    .set({ status: "canceled", canceledAt: new Date(), updatedAt: new Date() })
+  // 2. Stale pending_payment bookings (>72h old). Unpaid ones are simply
+  // canceled; any that carry a payment intent were PAID but never confirmed
+  // (a webhook failure window) — those get the full refund + apology path,
+  // never a silent cancel of money we're holding.
+  const staleRows = await db
+    .select()
+    .from(bookings)
     .where(and(eq(bookings.status, "pending_payment"), lt(bookings.createdAt, hours(-72))))
-    .returning({ id: bookings.id });
-  counts.stale_pending_canceled = stale.length;
+    .limit(50);
+  for (const booking of staleRows) {
+    if (booking.stripePaymentIntentId) {
+      try {
+        await loseRace(db, booking);
+        counts.stale_paid_refunded = (counts.stale_paid_refunded ?? 0) + 1;
+      } catch (err) {
+        console.error(`lifecycle: refund of stale paid booking ${booking.id} failed`, err);
+      }
+    } else {
+      await db
+        .update(bookings)
+        .set({ status: "canceled", canceledAt: new Date(), updatedAt: new Date() })
+        .where(eq(bookings.id, booking.id));
+      counts.stale_pending_canceled = (counts.stale_pending_canceled ?? 0) + 1;
+    }
+  }
 
   // 3. Abandoned-checkout recovery — exactly ONE email, 3–48h after start.
   // (Window is wide enough that the daily Hobby-plan cron never skips past
@@ -44,7 +62,10 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
         eq(bookings.status, "pending_payment"),
         lt(bookings.createdAt, hours(-3)),
         gt(bookings.createdAt, hours(-48)),
-        isNull(bookings.recoveryEmailSentAt)
+        isNull(bookings.recoveryEmailSentAt),
+        // A payment intent means they PAID (webhook still settling) — that's
+        // not an abandoned checkout, don't nudge them to book again.
+        isNull(bookings.stripePaymentIntentId)
       )
     )
     .limit(25);
