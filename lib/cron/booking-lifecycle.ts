@@ -25,15 +25,17 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
     .returning({ id: bookingHolds.id });
   counts.holds_expired = expiredHolds.length;
 
-  // 2. Stale pending_payment bookings (>24h old) → canceled.
+  // 2. Stale pending_payment bookings (>72h old) → canceled.
   const stale = await db
     .update(bookings)
     .set({ status: "canceled", canceledAt: new Date(), updatedAt: new Date() })
-    .where(and(eq(bookings.status, "pending_payment"), lt(bookings.createdAt, hours(-24))))
+    .where(and(eq(bookings.status, "pending_payment"), lt(bookings.createdAt, hours(-72))))
     .returning({ id: bookings.id });
   counts.stale_pending_canceled = stale.length;
 
-  // 3. Abandoned-checkout recovery — exactly ONE email, 3–24h after start.
+  // 3. Abandoned-checkout recovery — exactly ONE email, 3–48h after start.
+  // (Window is wide enough that the daily Hobby-plan cron never skips past
+  // anyone; the claim below guarantees at-most-once regardless of cadence.)
   const abandoned = await db
     .select()
     .from(bookings)
@@ -41,7 +43,7 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
       and(
         eq(bookings.status, "pending_payment"),
         lt(bookings.createdAt, hours(-3)),
-        gt(bookings.createdAt, hours(-24)),
+        gt(bookings.createdAt, hours(-48)),
         isNull(bookings.recoveryEmailSentAt)
       )
     )
@@ -63,15 +65,20 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
     }
   }
 
-  // 4. 24-hour reminders (email + SMS) for confirmed bookings.
+  // 4. Reminders (email + SMS) for confirmed bookings starting in the next
+  // 36 hours. From the daily 6 AM CT cron, that catches every next-day slot
+  // (8:00 AM = 26h out, 4:30 PM = 34.5h out) without ever firing two days
+  // early; reminderSentAt keeps it to exactly one reminder per booking. On
+  // Vercel Pro with an hourly cron, tighten this to gt(23)/lt(25) for
+  // reminders that land almost exactly 24h ahead.
   const upcoming = await db
     .select()
     .from(bookings)
     .where(
       and(
         eq(bookings.status, "confirmed"),
-        gt(bookings.startAt, hours(23)),
-        lt(bookings.startAt, hours(25)),
+        gt(bookings.startAt, hours(2)),
+        lt(bookings.startAt, hours(36)),
         isNull(bookings.reminderSentAt)
       )
     )
