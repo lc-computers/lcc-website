@@ -1,11 +1,11 @@
-"use client";
-
-import { useEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
- * Subtle scroll reveal. CSS handles the transition and disables all movement
- * under prefers-reduced-motion; this only toggles a class when the element
- * enters the viewport. Content is always visible without JavaScript.
+ * Subtle scroll reveal — a zero-JS server component. The single RevealInit
+ * observer in the root layout toggles `.is-visible`; CSS handles the
+ * transition, disables movement under prefers-reduced-motion, and only hides
+ * content when JS is actually running (html.js). Content is always visible
+ * without JavaScript.
  */
 export function Reveal({
   children,
@@ -16,33 +16,9 @@ export function Reveal({
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      el.classList.add("is-visible");
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            el.classList.add("is-visible");
-            observer.disconnect();
-          }
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <div
-      ref={ref}
+      data-reveal
       className={`reveal ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >

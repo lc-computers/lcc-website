@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ChatLauncher } from "@/components/chat/ChatLauncher";
+import { RevealInit } from "@/components/ui/RevealInit";
 import { JsonLd } from "@/components/JsonLd";
 import { localBusinessJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main-content">{children}</main>
         <Footer />
         <ChatLauncher />
+        <RevealInit />
         <JsonLd data={localBusinessJsonLd()} />
         <Analytics />
       </body>
