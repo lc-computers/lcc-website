@@ -120,12 +120,12 @@ export function BookingFlow({ preselect, canceled }: { preselect?: string; cance
               {i > 0 ? <span aria-hidden="true" className="text-cream-300">—</span> : null}
               <span
                 aria-current={state === "current" ? "step" : undefined}
-                className={`flex items-center gap-1.5 font-semibold ${
+                className={`flex items-center gap-1.5 ${
                   state === "current"
-                    ? "text-navy-800"
+                    ? "font-semibold text-navy-800"
                     : state === "done"
-                      ? "text-brass-600"
-                      : "text-ink-500/60"
+                      ? "font-semibold text-brass-700"
+                      : "font-normal text-ink-500"
                 }`}
               >
                 <span
@@ -135,7 +135,7 @@ export function BookingFlow({ preselect, canceled }: { preselect?: string; cance
                       ? "border-navy-700 bg-navy-700 text-cream-50"
                       : state === "done"
                         ? "border-brass-500 bg-brass-500 text-navy-950"
-                        : "border-cream-300 text-ink-500/60"
+                        : "border-cream-300 text-ink-500"
                   }`}
                 >
                   {n}

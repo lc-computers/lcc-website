@@ -62,7 +62,7 @@ export default function ContactPage() {
                     </h2>
                     <a
                       href={`mailto:${site.email}`}
-                      className="mt-1 block text-lg font-semibold text-navy-700 hover:text-navy-900"
+                      className="mt-1 block break-all text-lg font-semibold text-navy-700 hover:text-navy-900"
                     >
                       {site.email}
                     </a>

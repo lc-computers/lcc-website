@@ -15,7 +15,7 @@ export function Wordmark({
 }) {
   const markColor = variant === "dark" ? "text-navy-700" : "text-cream-50";
   const line1 = variant === "dark" ? "text-navy-900" : "text-cream-50";
-  const line2 = variant === "dark" ? "text-brass-600" : "text-brass-300";
+  const line2 = variant === "dark" ? "text-brass-700" : "text-brass-300";
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <Mark className={`h-9 w-9 shrink-0 ${markColor}`} />

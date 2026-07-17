@@ -67,57 +67,61 @@
   --shadow-card-hover: 0 2px 4px rgb(7 29 54 / 0.06), 0 10px 28px rgb(7 29 54 / 0.1);
 }
 
-/* ————— Base ————— */
+/* ————— Base —————
+   Inside @layer base so utility classes (e.g. text-cream-50 on navy
+   sections) always win — unlayered rules would override every utility. */
 
-html {
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
+@layer base {
   html {
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
   }
-}
 
-body {
-  background-color: var(--color-cream-50);
-  color: var(--color-ink-700);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--font-serif);
-  color: var(--color-ink-900);
-  text-wrap: balance;
-}
+  body {
+    background-color: var(--color-cream-50);
+    color: var(--color-ink-700);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-::selection {
-  background-color: var(--color-navy-700);
-  color: var(--color-cream-50);
-}
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    color: var(--color-ink-900);
+    text-wrap: balance;
+  }
 
-/* Visible, consistent keyboard focus everywhere */
-:focus-visible {
-  outline: 2px solid var(--color-navy-600);
-  outline-offset: 3px;
-  border-radius: 2px;
+  ::selection {
+    background-color: var(--color-navy-700);
+    color: var(--color-cream-50);
+  }
+
+  /* Visible, consistent keyboard focus everywhere */
+  :focus-visible {
+    outline: 2px solid var(--color-navy-600);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
 }
 
 /* ————— Reusable pieces ————— */
 
-/* Eyebrow label above section headings */
+/* Eyebrow label above section headings (brass-700 for AA contrast on cream) */
 @utility eyebrow {
   font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--color-brass-600);
+  color: var(--color-brass-700);
 }
 
 @utility eyebrow-light {

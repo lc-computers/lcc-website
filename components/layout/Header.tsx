@@ -10,7 +10,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-cream-200 bg-cream-50/95 backdrop-blur-sm">
       <div className="relative mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
-        <Link href="/" aria-label="Lake Cumberland Computers — home" className="shrink-0">
+        {/* Name comes from the visible wordmark text — an aria-label here
+            would mismatch the computed visible text (axe label-content-name). */}
+        <Link href="/" className="shrink-0">
           <Wordmark />
         </Link>
 

@@ -27,7 +27,7 @@ const inputCls =
 const gradeStyles: Record<string, string> = {
   A: "bg-[#E8F2E8] text-[#2D5A2D]",
   B: "bg-navy-50 text-navy-700",
-  C: "bg-[#FBF3DF] text-brass-600",
+  C: "bg-[#FBF3DF] text-brass-700",
   D: "bg-[#FAECE0] text-[#9A5B23]",
   F: "bg-[#F9E7E4] text-[#A03426]",
 };

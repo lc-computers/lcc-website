@@ -9,14 +9,18 @@ import { localBusinessJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 import "./globals.css";
 
+// Static weights only — a fraction of the bytes of the full variable fonts,
+// which is what the hero (LCP) heading waits on.
 const publicSans = Public_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-public-sans",
   display: "swap",
 });
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
+  weight: ["400", "600"],
   variable: "--font-source-serif",
   display: "swap",
 });
@@ -45,7 +49,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${publicSans.variable} ${sourceSerif.variable}`}>
+    // suppressHydrationWarning: the inline script below adds the "js" class
+    // to <html> before hydration (scroll-reveal no-JS fallback) — that class
+    // difference is intentional.
+    <html
+      lang="en"
+      className={`${publicSans.variable} ${sourceSerif.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         {/* Enables scroll-reveal initial states only when JS runs (see globals.css) */}
         <script
