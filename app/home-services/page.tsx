@@ -20,6 +20,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { serviceJsonLd } from "@/lib/jsonld";
 import { site } from "@/lib/site";
 import { getServiceMenu } from "@/lib/booking/services";
+import { formatBookingWindow } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "In-Home Computer Help — Flat Rates, Book Online",
@@ -89,6 +90,10 @@ const faq = [
   },
 ];
 
+// Hourly refresh so limited-time promos appear/expire on schedule without an
+// admin edit (admin saves still revalidate immediately).
+export const revalidate = 3600;
+
 export default async function HomeServicesPage() {
   const menu = await getServiceMenu();
   return (
@@ -139,6 +144,12 @@ export default async function HomeServicesPage() {
                       {service.priceDisplay}
                     </span>
                   </div>
+                  {formatBookingWindow(service) ? (
+                    <p className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-brass-500/15 px-2.5 py-1 text-xs font-bold text-brass-700">
+                      <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
+                      Limited time — book for {formatBookingWindow(service)}
+                    </p>
+                  ) : null}
                   <p className="mt-3 text-sm text-ink-500">{service.blurb}</p>
                   <ul className="mt-4 flex-1 space-y-2">
                     {service.includes.map((inc) => (

@@ -116,6 +116,10 @@ export interface ResidentialService {
   bufferMinutes: number;
   blurb: string;
   includes: string[];
+  /** Earliest bookable appointment date, "YYYY-MM-DD" Chicago. Null/absent = no limit. */
+  bookableFrom?: string | null;
+  /** Latest bookable appointment date, "YYYY-MM-DD" Chicago. Null/absent = no limit. */
+  bookableUntil?: string | null;
 }
 
 /** Residential flat-rate menu (Track B). Prices are final — services only, no sales tax. */

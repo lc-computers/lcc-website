@@ -5,7 +5,8 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { isAdmin } from "@/lib/admin/auth";
 import { hasDb } from "@/lib/db";
-import { loadCatalog, type CatalogService } from "@/lib/booking/services";
+import { loadCatalog, serviceWindowEnded, type CatalogService } from "@/lib/booking/services";
+import { formatBookingWindow, formatDateKey } from "@/lib/format";
 import { DeleteServiceButton } from "@/components/admin/DeleteServiceButton";
 import { saveServiceAction } from "../actions";
 
@@ -104,6 +105,35 @@ function ServiceForm({ service }: { service?: CatalogService }) {
           className={inputCls}
         />
       </div>
+      <div>
+        <label htmlFor={`from-${service?.slug ?? "new"}`} className={labelCls}>
+          Bookable from (optional)
+        </label>
+        <input
+          id={`from-${service?.slug ?? "new"}`}
+          name="bookableFrom"
+          type="date"
+          defaultValue={service?.bookableFrom ?? ""}
+          className={inputCls}
+        />
+      </div>
+      <div>
+        <label htmlFor={`until-${service?.slug ?? "new"}`} className={labelCls}>
+          Bookable until (optional)
+        </label>
+        <input
+          id={`until-${service?.slug ?? "new"}`}
+          name="bookableUntil"
+          type="date"
+          defaultValue={service?.bookableUntil ?? ""}
+          className={inputCls}
+        />
+      </div>
+      <p className="-mt-2 text-xs text-ink-500 sm:col-span-2">
+        Leave both blank for always bookable. Set dates to run a limited-time promo:
+        appointments can only land on days inside the window (inclusive), and the service
+        drops off the site by itself once the last day passes.
+      </p>
       <div className="sm:col-span-2">
         <label htmlFor={`blurb-${service?.slug ?? "new"}`} className={labelCls}>
           Short description (shown on the menu and to the chat assistant)
@@ -195,7 +225,9 @@ export default async function AdminServicesPage({
         immediately. Existing bookings always keep the price the customer already paid. A service
         with bookings on record can&rsquo;t be deleted (past bookings still need its name) — uncheck
         &ldquo;Bookable&rdquo; to take it off the menu instead. Set a price of $0 to run a free
-        promotion: customers book normally but skip payment entirely.
+        promotion: customers book normally but skip payment entirely. Give a service a booking
+        window (from/until dates) to run it as a limited-time offer — appointments can only be
+        booked for days inside the window, and it leaves the site on its own when the window ends.
       </p>
 
       {params.error ? (
@@ -231,11 +263,23 @@ export default async function AdminServicesPage({
               <span className="text-xs text-ink-500">
                 {s.kind === "remote" ? "Remote" : "In-home"} · {s.durationMinutes} min
                 {s.bufferMinutes > 0 ? ` + ${s.bufferMinutes} min travel` : ""} ·{" "}
-                {s.active ? (
-                  <span className="rounded-full bg-[#E8F2E8] px-2 py-0.5 font-bold text-[#2D5A2D]">bookable</span>
-                ) : (
+                {!s.active ? (
                   <span className="rounded-full bg-cream-100 px-2 py-0.5 font-bold text-ink-500">off the menu</span>
+                ) : serviceWindowEnded(s) ? (
+                  <span className="rounded-full bg-cream-100 px-2 py-0.5 font-bold text-brass-700">
+                    promo ended {formatDateKey(s.bookableUntil!)}
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-[#E8F2E8] px-2 py-0.5 font-bold text-[#2D5A2D]">bookable</span>
                 )}
+                {s.active && !serviceWindowEnded(s) && formatBookingWindow(s) ? (
+                  <>
+                    {" "}
+                    <span className="rounded-full bg-navy-50 px-2 py-0.5 font-bold text-navy-700">
+                      {formatBookingWindow(s)}
+                    </span>
+                  </>
+                ) : null}
               </span>
             </summary>
             <div className="border-t border-cream-200 p-5">

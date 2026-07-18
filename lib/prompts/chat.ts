@@ -1,5 +1,6 @@
 import { site, businessServices } from "@/lib/site";
 import { getServiceMenu } from "@/lib/booking/services";
+import { formatBookingWindow } from "@/lib/format";
 
 /**
  * System prompt for the website chat agent. Server-side only — never sent to
@@ -8,14 +9,16 @@ import { getServiceMenu } from "@/lib/booking/services";
  */
 export async function buildChatSystemPrompt(): Promise<string> {
   const menu = (await getServiceMenu())
-    .map(
-      (s) =>
-        `- ${s.name} — ${s.priceDisplay} (${
-          s.kind === "remote"
-            ? `remote, ${s.durationMinutes} min, no travel fee ever`
-            : `in-home, ${s.durationMinutes}-minute appointment`
-        })${s.blurb ? ` — ${s.blurb}` : ""} → booking link: /book?service=${s.slug}`
-    )
+    .map((s) => {
+      const window = formatBookingWindow(s);
+      return `- ${s.name} — ${s.priceDisplay} (${
+        s.kind === "remote"
+          ? `remote, ${s.durationMinutes} min, no travel fee ever`
+          : `in-home, ${s.durationMinutes}-minute appointment`
+      })${
+        window ? ` — LIMITED-TIME OFFER: appointments only available ${window}; mention this` : ""
+      }${s.blurb ? ` — ${s.blurb}` : ""} → booking link: /book?service=${s.slug}`;
+    })
     .join("\n");
 
   const bizServices = businessServices.map((s) => `- ${s.name}: ${s.short}`).join("\n");

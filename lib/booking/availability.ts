@@ -10,6 +10,7 @@ import {
   chicagoTimeToUtc,
   dateKey,
   isWeekday,
+  parseDateKey,
   type ChicagoDate,
 } from "@/lib/time";
 import { formatTime } from "@/lib/format";
@@ -150,18 +151,47 @@ export interface DayAvailability {
   slots: { start: string; label: string }[];
 }
 
+/** Service fields the availability engine cares about. */
+export type BookableService = Pick<
+  ResidentialService,
+  "durationMinutes" | "bufferMinutes" | "bookableFrom" | "bookableUntil"
+>;
+
+/**
+ * Is this Chicago date inside the service's booking window? Date keys are
+ * YYYY-MM-DD, so string comparison is date comparison.
+ */
+export function dayInWindow(service: BookableService, key: string): boolean {
+  if (service.bookableFrom && key < service.bookableFrom) return false;
+  if (service.bookableUntil && key > service.bookableUntil) return false;
+  return true;
+}
+
 /** Public availability for the booking UI. */
 export async function getAvailability(
   db: Db,
-  service: Pick<ResidentialService, "durationMinutes" | "bufferMinutes">,
+  service: BookableService,
   opts?: { days?: number; excludeBookingId?: string }
 ): Promise<DayAvailability[]> {
   const now = new Date();
   const horizon = opts?.days ?? BOOKING_HORIZON_DAYS;
   const today = chicagoDateOf(now);
+  const todayKey = dateKey(today);
+
+  // Promo window: scan starts at the window's first day even when that's
+  // beyond the normal horizon (so a promo announced early still shows its
+  // days), and never extends past the window's last day. Ended window → [].
+  if (service.bookableUntil && service.bookableUntil < todayKey) return [];
+  const firstDay =
+    service.bookableFrom && service.bookableFrom > todayKey
+      ? parseDateKey(service.bookableFrom)
+      : today;
+  let lastDay = addDays(firstDay, horizon);
+  if (service.bookableUntil && service.bookableUntil < dateKey(lastDay)) {
+    lastDay = parseDateKey(service.bookableUntil);
+  }
 
   const rangeStart = now;
-  const lastDay = addDays(today, horizon);
   const rangeEnd = chicagoTimeToUtc(lastDay.year, lastDay.month, lastDay.day, 23, 59);
 
   const capacity = await getCapacity(db);
@@ -177,8 +207,10 @@ export async function getAvailability(
     day: "numeric",
   });
 
-  for (let i = 0; i <= horizon; i++) {
-    const day = addDays(today, i);
+  const lastKey = dateKey(lastDay);
+  for (let i = 0; ; i++) {
+    const day = addDays(firstDay, i);
+    if (dateKey(day) > lastKey) break;
     if (!isWeekday(day)) continue;
     const candidates = slotCandidatesForDay(service, day);
     const slots = candidates
@@ -203,12 +235,13 @@ export async function getAvailability(
  */
 export async function isSlotAvailable(
   db: Db,
-  service: Pick<ResidentialService, "durationMinutes" | "bufferMinutes">,
+  service: BookableService,
   start: Date,
   opts?: { excludeBookingId?: string; skipLeadCheck?: boolean }
 ): Promise<{ ok: boolean; reason?: string; slot?: SlotCandidate }> {
   const day = chicagoDateOf(start);
   if (!isWeekday(day)) return { ok: false, reason: "outside_hours" };
+  if (!dayInWindow(service, dateKey(day))) return { ok: false, reason: "outside_window" };
   const candidates = slotCandidatesForDay(service, day);
   const slot = candidates.find((c) => c.start.getTime() === start.getTime());
   if (!slot) return { ok: false, reason: "invalid_slot" };

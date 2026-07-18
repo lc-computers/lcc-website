@@ -84,3 +84,18 @@ export function isWeekday(d: ChicagoDate): boolean {
 export function dateKey(d: ChicagoDate): string {
   return `${d.year}-${String(d.month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
 }
+
+/** Today's "YYYY-MM-DD" key in Chicago. */
+export function chicagoTodayKey(): string {
+  return dateKey(chicagoDateOf(new Date()));
+}
+
+/** ChicagoDate for a "YYYY-MM-DD" key. */
+export function parseDateKey(key: string): ChicagoDate {
+  const parts = key.split("-").map(Number);
+  const year = parts[0] ?? 0;
+  const month = parts[1] ?? 1;
+  const day = parts[2] ?? 1;
+  const base = new Date(Date.UTC(year, month - 1, day, 12));
+  return { year, month, day, weekday: base.getUTCDay() };
+}

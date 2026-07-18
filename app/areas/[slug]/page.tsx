@@ -10,6 +10,10 @@ import { areaPages, getAreaPage } from "@/lib/content/areas";
 import { businessServices, site } from "@/lib/site";
 import { getServiceMenu } from "@/lib/booking/services";
 
+// Hourly refresh so limited-time promos appear/expire on schedule without an
+// admin edit (admin saves still revalidate immediately).
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return areaPages.map((a) => ({ slug: a.slug }));
 }

@@ -4,6 +4,7 @@ import {
   integer,
   boolean,
   timestamp,
+  date,
   jsonb,
   uuid,
   index,
@@ -83,6 +84,10 @@ export const services = pgTable("services", {
   includes: jsonb("includes").$type<string[]>(),
   active: boolean("active").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
+  // Promo window: appointments must fall on Chicago calendar dates inside
+  // [bookableFrom, bookableUntil]. Null on either end = unbounded (always).
+  bookableFrom: date("bookable_from"),
+  bookableUntil: date("bookable_until"),
 });
 
 /**

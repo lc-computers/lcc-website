@@ -74,6 +74,9 @@ const serviceFormSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(99),
   blurb: z.string().trim().max(600),
   includes: z.string().max(2500),
+  // "" = no limit on that end; both blank = always bookable.
+  bookableFrom: z.string().trim().regex(/^(\d{4}-\d{2}-\d{2})?$/, "Use the date picker"),
+  bookableUntil: z.string().trim().regex(/^(\d{4}-\d{2}-\d{2})?$/, "Use the date picker"),
 });
 
 function slugify(name: string): string {
@@ -106,6 +109,8 @@ export async function saveServiceAction(formData: FormData): Promise<void> {
     sortOrder: formData.get("sortOrder") ?? "",
     blurb: formData.get("blurb") ?? "",
     includes: formData.get("includes") ?? "",
+    bookableFrom: formData.get("bookableFrom") ?? "",
+    bookableUntil: formData.get("bookableUntil") ?? "",
   });
   if (!parsed.success) {
     const first = parsed.error.issues[0];
@@ -120,6 +125,12 @@ export async function saveServiceAction(formData: FormData): Promise<void> {
   const isNew = input.slug === "";
   const slug = isNew ? slugify(input.name) : input.slug;
   if (!slug) redirect("/admin/services?error=Name+needs+letters+or+numbers");
+  if (input.bookableFrom && input.bookableUntil && input.bookableUntil < input.bookableFrom) {
+    redirect(
+      "/admin/services?error=" +
+        encodeURIComponent('"Bookable until" can\'t be before "Bookable from".')
+    );
+  }
 
   const values = {
     name: input.name,
@@ -135,6 +146,8 @@ export async function saveServiceAction(formData: FormData): Promise<void> {
       .filter(Boolean)
       .slice(0, 10),
     active,
+    bookableFrom: input.bookableFrom || null,
+    bookableUntil: input.bookableUntil || null,
   };
 
   if (isNew) {

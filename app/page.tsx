@@ -32,6 +32,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+// Hourly refresh so limited-time promos appear/expire on schedule without an
+// admin edit (admin saves still revalidate immediately).
+export const revalidate = 3600;
+
 const serviceIcons = [Wrench, ShieldCheck, Mail, Wifi, PhoneCall, Camera] as const;
 
 export default async function HomePage() {

@@ -146,9 +146,11 @@ export async function POST(req: Request) {
     });
     if ("error" in reserved) {
       const message =
-        reserved.error === "slot_taken" || reserved.error === "too_soon"
-          ? "That time was just taken — please pick another slot."
-          : "That time isn't available — please pick another slot.";
+        reserved.error === "outside_window"
+          ? "That date is outside this offer's booking window — please pick another day."
+          : reserved.error === "slot_taken" || reserved.error === "too_soon"
+            ? "That time was just taken — please pick another slot."
+            : "That time isn't available — please pick another slot.";
       return NextResponse.json({ error: message, code: "slot_unavailable" }, { status: 409 });
     }
     bookingId = reserved.id;

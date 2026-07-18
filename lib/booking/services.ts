@@ -2,6 +2,7 @@ import { asc } from "drizzle-orm";
 import { cache } from "react";
 import { getDb, hasDb } from "@/lib/db";
 import { services } from "@/lib/db/schema";
+import { chicagoTodayKey } from "@/lib/time";
 import {
   formatCents,
   residentialServices,
@@ -20,12 +21,20 @@ import {
 export interface CatalogService extends ResidentialService {
   active: boolean;
   sortOrder: number;
+  bookableFrom: string | null;
+  bookableUntil: string | null;
 }
 
 type ServiceRow = typeof services.$inferSelect;
 
 function fallbackCatalog(): CatalogService[] {
-  return residentialServices.map((s, i) => ({ ...s, active: true, sortOrder: i }));
+  return residentialServices.map((s, i) => ({
+    ...s,
+    active: true,
+    sortOrder: i,
+    bookableFrom: null,
+    bookableUntil: null,
+  }));
 }
 
 function rowToService(row: ServiceRow): CatalogService {
@@ -43,7 +52,17 @@ function rowToService(row: ServiceRow): CatalogService {
     includes: row.includes ?? seed?.includes ?? [],
     active: row.active,
     sortOrder: row.sortOrder,
+    bookableFrom: row.bookableFrom,
+    bookableUntil: row.bookableUntil,
   };
+}
+
+/** True once a service's booking window is entirely in the past (Chicago). */
+export function serviceWindowEnded(
+  s: Pick<CatalogService, "bookableUntil">,
+  todayKey: string = chicagoTodayKey()
+): boolean {
+  return s.bookableUntil !== null && s.bookableUntil < todayKey;
 }
 
 /** Every service row (active and inactive), deduped per request. */
@@ -62,15 +81,20 @@ export const loadCatalog = cache(async (): Promise<CatalogService[]> => {
   }
 });
 
-/** Active services in display order — the public menu. */
+/**
+ * Active services in display order — the public menu. Promos whose booking
+ * window has fully passed drop off automatically (no admin action needed).
+ */
 export async function getServiceMenu(): Promise<CatalogService[]> {
-  return (await loadCatalog()).filter((s) => s.active);
+  const todayKey = chicagoTodayKey();
+  return (await loadCatalog()).filter((s) => s.active && !serviceWindowEnded(s, todayKey));
 }
 
 /**
- * Look up one service. Active-only by default (booking new appointments);
- * pass includeInactive for existing bookings, whose service may since have
- * been turned off.
+ * Look up one service. Active-only by default (booking new appointments) —
+ * a service whose promo window has ended counts as off the menu too. Pass
+ * includeInactive for existing bookings, whose service may since have been
+ * turned off or expired.
  */
 export async function findService(
   slug: string,
@@ -79,6 +103,6 @@ export async function findService(
   const all = await loadCatalog();
   const found = all.find((s) => s.slug === slug);
   if (!found) return undefined;
-  if (!found.active && !opts?.includeInactive) return undefined;
+  if ((!found.active || serviceWindowEnded(found)) && !opts?.includeInactive) return undefined;
   return found;
 }

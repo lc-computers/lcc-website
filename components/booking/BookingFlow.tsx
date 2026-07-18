@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, BadgeCheck, Car, Loader2, Lock, Phone } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CalendarClock, Car, Loader2, Lock, Phone } from "lucide-react";
 import { SlotPicker, type SelectedSlot } from "./SlotPicker";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { track } from "@/lib/analytics/client";
 import { travelFeeCents } from "@/lib/booking/travel-fee";
-import { formatMoney } from "@/lib/format";
+import { formatBookingWindow, formatMoney } from "@/lib/format";
 import { site, type ResidentialService } from "@/lib/site";
 
 type Step = 1 | 2 | 3 | 4;
@@ -189,6 +189,12 @@ export function BookingFlow({
                   </span>
                 </span>
                 <span className="mt-2 flex-1 text-sm text-ink-500">{s.blurb}</span>
+                {formatBookingWindow(s) ? (
+                  <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full bg-brass-500/15 px-2.5 py-1 text-xs font-bold text-brass-700">
+                    <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
+                    Limited time — book for {formatBookingWindow(s)}
+                  </span>
+                ) : null}
                 <span className="mt-4 text-sm font-bold text-navy-700">
                   Select →
                 </span>
@@ -420,6 +426,11 @@ function ServiceSummary({
     <div className="flex items-center justify-between gap-4 rounded-md border border-cream-200 bg-cream-100 px-4 py-3">
       <p className="text-sm font-semibold text-ink-900">
         {service.name} — {service.priceDisplay}
+        {formatBookingWindow(service) ? (
+          <span className="ml-2 font-medium text-brass-700">
+            (available {formatBookingWindow(service)})
+          </span>
+        ) : null}
       </p>
       <button type="button" onClick={onChange} className="text-sm font-semibold text-navy-700 underline underline-offset-4 hover:text-navy-900">
         Change
