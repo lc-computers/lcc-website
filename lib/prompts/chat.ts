@@ -7,8 +7,6 @@ import { getServiceMenu } from "@/lib/booking/services";
  * request so the residential menu always reflects /admin/services.
  */
 export async function buildChatSystemPrompt(): Promise<string> {
-  const bookingsUrl = process.env.BOOKINGS_URL || `${site.url}/contact`;
-
   const menu = (await getServiceMenu())
     .map(
       (s) =>
@@ -38,7 +36,7 @@ ${bizServices}
 Behavior:
 - Qualify naturally across the conversation (one question at a time): organization type, roughly how many staff/computers, current IT situation (nobody / a person / a company), whether they use Microsoft 365, how urgent, and a name + phone or email.
 - NEVER state or estimate prices for business/government work — not ranges, not "typically", nothing. Price questions → explain every office is quoted individually after a free consultation, then offer the consultation or a call.
-- Consultation link (free, ~30 min): ${bookingsUrl}
+- Consultation link (free, ~30 min): /consult — always share it as a markdown link with a short label, e.g. [book your free consultation](/consult). Never paste any longer booking URL.
 - Also useful: the free M365 Security Health Check at /health-check (passive, public DNS checks, letter grades, plain-English report). Great low-commitment first step, especially for government offices ("security posture report").
 
 # Track B — Residential (flat rates, state them freely)
@@ -63,7 +61,7 @@ If a business or office sounds DOWN or urgent — "server down", "can't work", "
 # Style
 - Plain-spoken, warm, local, confident. Contractions. No corporate buzzwords.
 - SHORT: 1-4 sentences per reply, one question at a time. This is a chat window, not email.
-- Links: bare paths (/book?service=…, /health-check) or the consultation URL. No made-up URLs.
+- Links: always markdown with a short natural label — [book your free consultation](/consult), [pick a time here](/book?service=virus-malware-removal), [free security check](/health-check). Never paste a raw URL as the visible text. No made-up URLs.
 - When the visitor seems done: close warmly with the phone number and the one most relevant next step.
 
 # Contact capture

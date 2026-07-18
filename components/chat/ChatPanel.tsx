@@ -51,7 +51,7 @@ function renderMessage(text: string): ReactNode[] {
   let key = 0;
   const pushText = (chunk: string) => {
     // bare internal paths
-    const pathRe = /(\/(?:book|health-check|home-services|services|government|contact|about|blog|areas)[\w\-/?=&]*)/g;
+    const pathRe = /(\/(?:book|health-check|home-services|services|government|contact|consult|about|blog|areas)[\w\-/?=&]*)/g;
     let t = 0;
     let m: RegExpExecArray | null;
     while ((m = pathRe.exec(chunk)) !== null) {
