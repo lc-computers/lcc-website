@@ -7,7 +7,8 @@ import { ManageBooking } from "@/components/booking/ManageBooking";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { getDb, hasDb } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
-import { getResidentialService, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { findService } from "@/lib/booking/services";
 import { formatDateTime, formatMoney, formatTime } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export default async function ManageBookingPage({
   const db = getDb();
   const [booking] = await db.select().from(bookings).where(eq(bookings.manageToken, token));
   if (!booking) notFound();
-  const service = getResidentialService(booking.serviceSlug);
+  const service = await findService(booking.serviceSlug, { includeInactive: true });
   if (!service) notFound();
 
   const isPast = booking.startAt.getTime() < Date.now();

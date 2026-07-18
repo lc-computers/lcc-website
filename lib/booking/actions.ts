@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { Db } from "@/lib/db";
 import { bookings, bookingHolds } from "@/lib/db/schema";
-import { getResidentialService, site, type ResidentialService } from "@/lib/site";
+import { site, type ResidentialService } from "@/lib/site";
+import { findService } from "@/lib/booking/services";
 import { sendEmail } from "@/lib/email/send";
 import {
   bookingConfirmationEmail,
@@ -21,8 +22,9 @@ import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { trackServer } from "@/lib/analytics/server";
 import { formatDateTime, formatMoney, formatTime } from "@/lib/format";
 
-export function serviceForBooking(booking: BookingRow): ResidentialService {
-  const service = getResidentialService(booking.serviceSlug);
+export async function serviceForBooking(booking: BookingRow): Promise<ResidentialService> {
+  // Inactive services stay resolvable — existing bookings outlive menu edits.
+  const service = await findService(booking.serviceSlug, { includeInactive: true });
   if (!service) throw new Error(`Unknown service slug on booking ${booking.id}`);
   return service;
 }
@@ -59,7 +61,7 @@ export async function runConfirmationEffects(
   booking: BookingRow,
   opts?: { rescheduled?: boolean }
 ): Promise<void> {
-  const service = serviceForBooking(booking);
+  const service = await serviceForBooking(booking);
 
   // Shared "Service Appointments" calendar
   try {
@@ -148,7 +150,7 @@ export async function refundBookingPayment(booking: BookingRow): Promise<boolean
 
 /** Race-loss path: refund, mark honestly, apologize. */
 export async function loseRace(db: Db, booking: BookingRow): Promise<void> {
-  const service = serviceForBooking(booking);
+  const service = await serviceForBooking(booking);
   const refunded = await refundBookingPayment(booking);
   await db
     .update(bookings)
@@ -178,7 +180,7 @@ export async function loseRace(db: Db, booking: BookingRow): Promise<void> {
 
 /** Customer-initiated cancel (≥24h) — auto-refund via Stripe. */
 export async function cancelBookingWithRefund(db: Db, booking: BookingRow): Promise<boolean> {
-  const service = serviceForBooking(booking);
+  const service = await serviceForBooking(booking);
   const refunded = await refundBookingPayment(booking);
   await db
     .update(bookings)

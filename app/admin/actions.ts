@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { getDb, hasDb } from "@/lib/db";
-import { posts, newsletters } from "@/lib/db/schema";
+import { posts, newsletters, services } from "@/lib/db/schema";
 import {
   grantAdminCookie,
   revokeAdminCookie,
@@ -55,6 +56,109 @@ export async function updateCapacityAction(formData: FormData): Promise<void> {
   await setCapacity(db, n);
   revalidatePath("/admin");
   redirect("/admin?capacity=saved");
+}
+
+/* ---------------- Residential service menu ---------------- */
+
+const serviceFormSchema = z.object({
+  slug: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9-]*$/)
+    .max(64),
+  name: z.string().trim().min(3).max(80),
+  price: z.coerce.number().min(0).max(5000),
+  kind: z.enum(["in_home", "remote"]),
+  durationMinutes: z.coerce.number().int().min(15).max(240),
+  bufferMinutes: z.coerce.number().int().min(0).max(120),
+  sortOrder: z.coerce.number().int().min(0).max(99),
+  blurb: z.string().trim().max(600),
+  includes: z.string().max(2500),
+});
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+/** Pages that render the residential menu — regenerate after any edit. */
+function revalidateServicePages(): void {
+  revalidatePath("/");
+  revalidatePath("/home-services");
+  revalidatePath("/book");
+  revalidatePath("/areas/[slug]", "page");
+  revalidatePath("/admin/services");
+}
+
+export async function saveServiceAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const db = requireDb();
+  const parsed = serviceFormSchema.safeParse({
+    slug: formData.get("slug") ?? "",
+    name: formData.get("name") ?? "",
+    price: formData.get("price") ?? "",
+    kind: formData.get("kind") ?? "",
+    durationMinutes: formData.get("durationMinutes") ?? "",
+    bufferMinutes: formData.get("bufferMinutes") ?? "",
+    sortOrder: formData.get("sortOrder") ?? "",
+    blurb: formData.get("blurb") ?? "",
+    includes: formData.get("includes") ?? "",
+  });
+  if (!parsed.success) {
+    const first = parsed.error.issues[0];
+    redirect(
+      `/admin/services?error=${encodeURIComponent(
+        first ? `${first.path.join(".")}: ${first.message}` : "Please check the form."
+      )}`
+    );
+  }
+  const input = parsed.data;
+  const active = formData.get("active") === "on";
+  const isNew = input.slug === "";
+  const slug = isNew ? slugify(input.name) : input.slug;
+  if (!slug) redirect("/admin/services?error=Name+needs+letters+or+numbers");
+
+  const values = {
+    name: input.name,
+    priceCents: Math.round(input.price * 100),
+    kind: input.kind,
+    durationMinutes: input.durationMinutes,
+    bufferMinutes: input.kind === "remote" ? 0 : input.bufferMinutes,
+    sortOrder: input.sortOrder,
+    blurb: input.blurb || null,
+    includes: input.includes
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .slice(0, 10),
+    active,
+  };
+
+  if (isNew) {
+    const inserted = await db
+      .insert(services)
+      .values({ slug, ...values })
+      .onConflictDoNothing({ target: services.slug })
+      .returning({ slug: services.slug });
+    if (inserted.length === 0) {
+      redirect(
+        `/admin/services?error=${encodeURIComponent(`A service with the link name "${slug}" already exists — pick a different name.`)}`
+      );
+    }
+  } else {
+    const updated = await db
+      .update(services)
+      .set(values)
+      .where(eq(services.slug, slug))
+      .returning({ slug: services.slug });
+    if (updated.length === 0) redirect("/admin/services?error=Service+not+found");
+  }
+
+  revalidateServicePages();
+  redirect(`/admin/services?saved=${encodeURIComponent(slug)}`);
 }
 
 export async function generateDraftAction(): Promise<void> {

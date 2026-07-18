@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { BookingFlow } from "@/components/booking/BookingFlow";
+import { getServiceMenu } from "@/lib/booking/services";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default async function BookPage({
   searchParams: Promise<{ service?: string; canceled?: string }>;
 }) {
   const params = await searchParams;
+  const services = await getServiceMenu();
   return (
     <>
       <section className="border-b border-cream-200 bg-cream-100">
@@ -31,7 +33,7 @@ export default async function BookPage({
       </section>
       <section className="py-10 sm:py-14">
         <Container>
-          <BookingFlow preselect={params.service} canceled={params.canceled === "1"} />
+          <BookingFlow services={services} preselect={params.service} canceled={params.canceled === "1"} />
         </Container>
       </section>
     </>

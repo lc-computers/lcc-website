@@ -48,6 +48,7 @@ Useful scripts:
 npm run build            # production build (must stay clean)
 npm run typecheck        # tsc --noEmit
 npx tsx scripts/test-booking-engine.ts   # availability/capacity/holds test (needs DATABASE_URL)
+npx tsx scripts/test-service-catalog.ts  # DB-backed service menu test (needs DATABASE_URL)
 npm run pdf:capability   # regenerate the capability-statement PDF into /public
 ```
 
@@ -175,6 +176,17 @@ land almost exactly 24h ahead.
   many appointments can overlap one time slot. Stored in `app_settings`
   (`technician_count`) and applied immediately to slot listings, checkout,
   and the webhook capacity re-check. Existing bookings are never affected.
+- **Services & pricing** (`/admin/services`): the residential menu lives in
+  the `services` table and is fully editable — add services, change names,
+  prices, durations, descriptions, and "what's included," or untick
+  *Bookable* to pull one off the menu (never delete: past bookings reference
+  it). Edits propagate immediately to `/book`, the home / home-services /
+  area pages, JSON-LD offers, and the chat agent's menu and quotes. Existing
+  bookings keep the price that was paid. `lib/site.ts` remains only the
+  first-run seed and the no-database fallback; `npm run db:seed` never
+  overwrites admin edits (insert-if-missing). The capability-statement PDF
+  is generated from `lib/site.ts` at build time — if you change residential
+  prices, update that file too and run `npm run pdf:capability`.
 - "Draft next topic" pulls from the 20-topic seeded queue → Claude drafts →
   review/edit → **Approve & publish** → live at `/blog/<slug>` immediately
   (blog renders from the DB; the four launch articles are seeded and also

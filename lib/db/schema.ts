@@ -68,7 +68,10 @@ export const healthChecks = pgTable(
   (t) => [index("health_checks_domain_idx").on(t.domain)]
 );
 
-/** Residential service menu (seeded from lib/site.ts). */
+/**
+ * Residential service menu — source of truth, managed from /admin/services
+ * (initially seeded from lib/site.ts, which stays as the no-DB fallback).
+ */
 export const services = pgTable("services", {
   slug: text("slug").primaryKey(),
   name: text("name").notNull(),
@@ -76,6 +79,8 @@ export const services = pgTable("services", {
   kind: text("kind").notNull(), // in_home | remote
   durationMinutes: integer("duration_minutes").notNull(),
   bufferMinutes: integer("buffer_minutes").notNull().default(0),
+  blurb: text("blurb"),
+  includes: jsonb("includes").$type<string[]>(),
   active: boolean("active").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
 });

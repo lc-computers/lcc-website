@@ -130,7 +130,7 @@ export async function POST(req: Request) {
         const runner = anthropic.messages.stream({
           model: CHAT_MODEL,
           max_tokens: 700,
-          system: buildChatSystemPrompt(),
+          system: await buildChatSystemPrompt(),
           messages: modelContext.map((m) => ({ role: m.role, content: m.content })),
         });
         runner.on("text", (text) => {

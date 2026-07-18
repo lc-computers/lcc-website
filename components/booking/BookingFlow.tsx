@@ -7,7 +7,7 @@ import { PhoneLink } from "@/components/ui/PhoneLink";
 import { track } from "@/lib/analytics/client";
 import { travelFeeCents } from "@/lib/booking/travel-fee";
 import { formatMoney } from "@/lib/format";
-import { site, residentialServices, type ResidentialService } from "@/lib/site";
+import { site, type ResidentialService } from "@/lib/site";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -36,8 +36,16 @@ const inputCls =
 
 const stepTitles = ["Service", "Your details", "Pick a time", "Review & pay"];
 
-export function BookingFlow({ preselect, canceled }: { preselect?: string; canceled?: boolean }) {
-  const preselected = residentialServices.find((s) => s.slug === preselect) ?? null;
+export function BookingFlow({
+  services,
+  preselect,
+  canceled,
+}: {
+  services: ResidentialService[];
+  preselect?: string;
+  canceled?: boolean;
+}) {
+  const preselected = services.find((s) => s.slug === preselect) ?? null;
   const [step, setStep] = useState<Step>(preselected ? 2 : 1);
   const [service, setService] = useState<ResidentialService | null>(preselected);
   const [details, setDetails] = useState<Details>(emptyDetails);
@@ -164,7 +172,7 @@ export function BookingFlow({ preselect, canceled }: { preselect?: string; cance
         {/* Step 1 — service */}
         {step === 1 ? (
           <div className="grid gap-4 md:grid-cols-2">
-            {residentialServices.map((s) => (
+            {services.map((s) => (
               <button
                 key={s.slug}
                 onClick={() => choose(s)}

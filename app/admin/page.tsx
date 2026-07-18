@@ -190,6 +190,22 @@ export default async function AdminPage({
         </div>
       </section>
 
+      {/* Service menu */}
+      <section className="mt-5 rounded-lg border border-cream-200 bg-white p-5 shadow-card">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-serif text-xl font-semibold text-ink-900">Services &amp; pricing</h2>
+            <p className="mt-1 max-w-xl text-sm text-ink-700">
+              Add residential services, change prices and descriptions, or take something off the
+              menu. Updates the booking flow, the public pages, and the chat assistant immediately.
+            </p>
+          </div>
+          <Link href="/admin/services" className={`${btn} shrink-0`}>
+            Manage services
+          </Link>
+        </div>
+      </section>
+
       {/* Drafts */}
       <section className="mt-10">
         <div className="flex items-center justify-between gap-4">

@@ -38,6 +38,8 @@ async function main() {
   const db = getDb();
 
   console.log("Seeding services…");
+  // Insert-if-missing only: the services table is managed from /admin/services
+  // once live, so re-running the seed must never clobber the owner's edits.
   for (const s of residentialServices) {
     await db
       .insert(services)
@@ -48,19 +50,12 @@ async function main() {
         kind: s.kind,
         durationMinutes: s.durationMinutes,
         bufferMinutes: s.bufferMinutes,
+        blurb: s.blurb,
+        includes: s.includes,
         active: true,
         sortOrder: residentialServices.indexOf(s),
       })
-      .onConflictDoUpdate({
-        target: services.slug,
-        set: {
-          name: s.name,
-          priceCents: s.priceCents,
-          kind: s.kind,
-          durationMinutes: s.durationMinutes,
-          bufferMinutes: s.bufferMinutes,
-        },
-      });
+      .onConflictDoNothing({ target: services.slug });
   }
 
   console.log("Seeding keyword queue…");

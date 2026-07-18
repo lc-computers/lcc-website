@@ -1,16 +1,22 @@
-import { site, residentialServices, businessServices } from "@/lib/site";
+import { site, businessServices } from "@/lib/site";
+import { getServiceMenu } from "@/lib/booking/services";
 
 /**
  * System prompt for the website chat agent. Server-side only — never sent to
- * or referenced for the client beyond the responses it produces.
+ * or referenced for the client beyond the responses it produces. Built per
+ * request so the residential menu always reflects /admin/services.
  */
-export function buildChatSystemPrompt(): string {
+export async function buildChatSystemPrompt(): Promise<string> {
   const bookingsUrl = process.env.BOOKINGS_URL || `${site.url}/contact`;
 
-  const menu = residentialServices
+  const menu = (await getServiceMenu())
     .map(
       (s) =>
-        `- ${s.name} — ${s.priceDisplay} (${s.kind === "remote" ? "remote, 30 min, no travel fee ever" : "in-home, 90-minute appointment"}) → booking link: /book?service=${s.slug}`
+        `- ${s.name} — ${s.priceDisplay} (${
+          s.kind === "remote"
+            ? `remote, ${s.durationMinutes} min, no travel fee ever`
+            : `in-home, ${s.durationMinutes}-minute appointment`
+        })${s.blurb ? ` — ${s.blurb}` : ""} → booking link: /book?service=${s.slug}`
     )
     .join("\n");
 
@@ -39,8 +45,8 @@ Behavior:
 ${menu}
 - Travel fee: $0 inside Russell Springs; flat $25 for surrounding-county addresses (shown before payment). Remote sessions NEVER have a travel fee.
 - No sales tax — services only. Cancellation: full refund if canceled 24+ hours ahead; free reschedule anytime.
-- Diagnose their problem in plain English first, then recommend the ONE service that fits, state its exact price, and hand off with the deep link, e.g. "I can get that booked for you right now — pick a time here: /book?service=virus-malware-removal". Always also offer the phone: ${site.phone.display}.
-- Matching guide: pop-ups/fake warnings/hijacked browser/suddenly slow with weird behavior → Virus & Malware Removal ($149). General slowness/printer/email/setup questions at their home → In-Home Tech Help ($99). Brand-new computer → New Computer Setup ($129). Wi-Fi dead spots/router trouble → Home Wi-Fi Setup/Fix ($129). Anything solvable by phone + screen share, or they're far away / want cheapest → Remote Support Session ($49).
+- Diagnose their problem in plain English first, then recommend the ONE service from the menu above that fits, state its exact menu price, and hand off with its booking link, e.g. "I can get that booked for you right now — pick a time here: /book?service=virus-malware-removal". Always also offer the phone: ${site.phone.display}.
+- Match by each service's description above. Rules of thumb: pop-ups/fake warnings/hijacked browser → the virus/malware service. Anything solvable by phone + screen share, or they're far away or want the cheapest option → the remote session. General "come look at it" problems → the general in-home visit. Only recommend services that appear in the menu; only quote the prices shown there.
 
 # EMERGENCY path (overrides everything)
 If a business or office sounds DOWN or urgent — "server down", "can't work", "ransomware", "we're locked out", "network is out", "everything stopped" — do NOT qualify, do NOT send links. Immediately: "Call us right now at ${site.phone.display}." One line of reassurance is fine. Phone first, always.

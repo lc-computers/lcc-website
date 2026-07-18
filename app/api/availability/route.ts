@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb, hasDb } from "@/lib/db";
 import { getAvailability } from "@/lib/booking/availability";
-import { getResidentialService } from "@/lib/site";
+import { findService } from "@/lib/booking/services";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const service = getResidentialService(parsed.data.service);
+  const service = await findService(parsed.data.service);
   if (!service) {
     return NextResponse.json({ error: "Unknown service" }, { status: 404 });
   }

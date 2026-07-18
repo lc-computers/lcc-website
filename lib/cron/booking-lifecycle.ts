@@ -78,7 +78,7 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
       .returning({ id: bookings.id });
     if (claimed.length === 0) continue;
     try {
-      const email = abandonedRecoveryEmail(booking, serviceForBooking(booking));
+      const email = abandonedRecoveryEmail(booking, await serviceForBooking(booking));
       await sendEmail({ to: booking.email, subject: email.subject, html: email.html });
       counts.abandoned_recovery = (counts.abandoned_recovery ?? 0) + 1;
     } catch (err) {
@@ -112,7 +112,7 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
       .returning({ id: bookings.id });
     if (claimed.length === 0) continue;
     try {
-      const service = serviceForBooking(booking);
+      const service = await serviceForBooking(booking);
       const email = bookingReminderEmail(booking, service);
       await sendEmail({ to: booking.email, subject: email.subject, html: email.html });
       if (booking.smsConsent) {
@@ -158,7 +158,7 @@ export async function runBookingLifecycle(db: Db): Promise<Record<string, number
         .returning({ id: bookings.id });
       if (claimed.length === 0) continue;
       try {
-        const service = serviceForBooking(booking);
+        const service = await serviceForBooking(booking);
         const email = reviewRequestEmail(booking, service, reviewUrl);
         await sendEmail({ to: booking.email, subject: email.subject, html: email.html });
         if (booking.smsConsent) {

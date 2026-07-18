@@ -89,7 +89,7 @@ export async function POST(req: Request) {
   }
 
   // Reschedule — free anytime, new slot must be genuinely available.
-  const service = serviceForBooking(booking);
+  const service = await serviceForBooking(booking);
   const newStart = new Date(input.start);
 
   const result = await db.transaction(async (tx) => {

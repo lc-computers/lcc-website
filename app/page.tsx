@@ -25,7 +25,8 @@ import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { PhotoSlot } from "@/components/sections/PhotoSlot";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { site, businessServices, residentialServices } from "@/lib/site";
+import { site, businessServices } from "@/lib/site";
+import { getServiceMenu } from "@/lib/booking/services";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -33,10 +34,13 @@ export const metadata: Metadata = {
 
 const serviceIcons = [Wrench, ShieldCheck, Mail, Wifi, PhoneCall, Camera] as const;
 
-export default function HomePage() {
-  const featuredResidential = residentialServices.filter((s) =>
+export default async function HomePage() {
+  const menu = await getServiceMenu();
+  const featured = menu.filter((s) =>
     ["in-home-tech-help", "virus-malware-removal", "remote-support"].includes(s.slug)
   );
+  // If the admin renames/replaces those defaults, show the first three instead.
+  const featuredResidential = featured.length > 0 ? featured : menu.slice(0, 3);
 
   return (
     <>

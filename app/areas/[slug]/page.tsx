@@ -7,7 +7,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { BookingsLink } from "@/components/ui/BookingsLink";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { areaPages, getAreaPage } from "@/lib/content/areas";
-import { businessServices, residentialServices, site } from "@/lib/site";
+import { businessServices, site } from "@/lib/site";
+import { getServiceMenu } from "@/lib/booking/services";
 
 export function generateStaticParams() {
   return areaPages.map((a) => ({ slug: a.slug }));
@@ -35,7 +36,7 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
   if (!area) notFound();
 
   const otherAreas = areaPages.filter((a) => a.slug !== area.slug);
-  const menuHighlights = residentialServices.slice(0, 5);
+  const menuHighlights = (await getServiceMenu()).slice(0, 5);
 
   return (
     <>

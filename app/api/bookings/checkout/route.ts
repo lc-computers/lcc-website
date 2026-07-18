@@ -5,7 +5,8 @@ import { getDb, hasDb, type Db } from "@/lib/db";
 import { bookings, bookingHolds, leads } from "@/lib/db/schema";
 import { isSlotAvailable, withSlotLock } from "@/lib/booking/availability";
 import { travelFeeCents } from "@/lib/booking/travel-fee";
-import { getResidentialService, site } from "@/lib/site";
+import { findService } from "@/lib/booking/services";
+import { site } from "@/lib/site";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { randomToken } from "@/lib/tokens";
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
   }
   const input = parsed.data;
 
-  const service = getResidentialService(input.serviceSlug);
+  const service = await findService(input.serviceSlug);
   if (!service) {
     return NextResponse.json({ error: "Unknown service" }, { status: 400 });
   }

@@ -7,7 +7,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { getDb, hasDb } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
-import { getResidentialService, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { findService } from "@/lib/booking/services";
 import { formatDateTime, formatMoney } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -41,7 +42,9 @@ export default async function BookingSuccessPage({
 }) {
   const { session_id: sessionId } = await searchParams;
   const booking = sessionId ? await loadBooking(sessionId) : null;
-  const service = booking ? getResidentialService(booking.serviceSlug) : null;
+  const service = booking
+    ? await findService(booking.serviceSlug, { includeInactive: true })
+    : null;
   const confirmed = booking?.status === "confirmed";
   const lostRace = booking?.status === "refunded" || booking?.status === "canceled";
 

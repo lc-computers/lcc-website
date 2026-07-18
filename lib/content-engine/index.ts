@@ -33,7 +33,7 @@ export async function draftNextArticle(db: Db): Promise<DraftResult> {
   const response = await client.messages.create({
     model: DRAFT_MODEL,
     max_tokens: 4000,
-    system: buildArticlePrompt(),
+    system: await buildArticlePrompt(),
     messages: [
       {
         role: "user",

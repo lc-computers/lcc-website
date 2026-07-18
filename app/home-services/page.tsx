@@ -18,7 +18,8 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceJsonLd } from "@/lib/jsonld";
-import { site, residentialServices } from "@/lib/site";
+import { site } from "@/lib/site";
+import { getServiceMenu } from "@/lib/booking/services";
 
 export const metadata: Metadata = {
   title: "In-Home Computer Help — Flat Rates, Book Online",
@@ -88,7 +89,8 @@ const faq = [
   },
 ];
 
-export default function HomeServicesPage() {
+export default async function HomeServicesPage() {
+  const menu = await getServiceMenu();
   return (
     <>
       <section className="border-b border-cream-200 bg-cream-100">
@@ -126,7 +128,7 @@ export default function HomeServicesPage() {
             lede="Services only — no sales tax added. Every price below is the complete price, plus a flat $25 travel fee only if you're outside Russell Springs (never for remote sessions)."
           />
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {residentialServices.map((service, i) => (
+            {menu.map((service, i) => (
               <Reveal key={service.slug} delay={(i % 3) * 60}>
                 <div className="flex h-full flex-col rounded-lg border border-cream-200 bg-white p-6 shadow-card">
                   <div className="flex items-start justify-between gap-3">
@@ -262,7 +264,7 @@ export default function HomeServicesPage() {
             "Flat-rate residential tech services: in-home tech help, virus removal, new computer setup, home Wi-Fi, and remote support.",
           slug: "home-services",
           path: "/home-services",
-          offers: residentialServices.map((s) => ({
+          offers: menu.map((s) => ({
             name: s.name,
             price: s.priceCents / 100,
           })),

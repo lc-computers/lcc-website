@@ -115,7 +115,7 @@ async function handleCompleted(db: Db, session: Stripe.Checkout.Session) {
     .where(eq(bookings.id, booking.id));
   booking.stripePaymentIntentId = paymentIntentId;
 
-  const service = serviceForBooking(booking);
+  const service = await serviceForBooking(booking);
 
   // Final capacity check under the same per-day lock used at checkout.
   const won = await db.transaction(async (tx) => {
