@@ -182,8 +182,8 @@ export async function POST(req: Request) {
           currency: "usd",
           unit_amount: fee,
           product_data: {
-            name: "Travel fee (outside Russell Springs)",
-            description: "Flat fee for surrounding-county addresses",
+            name: "Travel fee (outside Russell Springs / Jamestown)",
+            description: "Flat fee for addresses beyond our no-fee ZIPs",
           },
         },
         quantity: 1,

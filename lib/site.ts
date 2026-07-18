@@ -56,7 +56,7 @@ export const site = {
     inTown: 0,
     surrounding: 25,
     explanation:
-      "No travel fee inside Russell Springs. Addresses in the surrounding counties add a flat $25 — shown before you pay, never after.",
+      "No travel fee in Russell Springs or Jamestown (ZIP 42642 and 42629). Addresses beyond those add a flat $25 — shown before you pay, never after.",
   },
   cancellation: {
     policy:

@@ -70,7 +70,7 @@ const faq = [
   {
     question: "What's the travel fee?",
     answer:
-      "Nothing inside Russell Springs. Addresses in the surrounding counties add a flat $25, shown clearly during booking before you pay. Remote sessions never have a travel fee no matter where you live.",
+      "Nothing in Russell Springs or Jamestown — ZIP 42642 and 42629 pay the menu price, period. Addresses beyond those add a flat $25, shown clearly during booking before you pay. Remote sessions never have a travel fee no matter where you live.",
   },
   {
     question: "What if I need to cancel or reschedule?",
@@ -125,7 +125,7 @@ export default async function HomeServicesPage() {
           <SectionHeading
             eyebrow="The menu"
             title="Flat-rate services and prices"
-            lede="Services only — no sales tax added. Every price below is the complete price, plus a flat $25 travel fee only if you're outside Russell Springs (never for remote sessions)."
+            lede="Services only — no sales tax added. Every price below is the complete price, plus a flat $25 travel fee only if you're outside Russell Springs and Jamestown (never for remote sessions)."
           />
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {menu.map((service, i) => (

@@ -40,9 +40,9 @@ export const areaPages: AreaPage[] = [
       "Jamestown is the seat of Russell County — the courthouse, the county offices, and the government paperwork that keeps the county running all live here, a ten-minute drive from our shop in Russell Springs. That proximity is exactly why serving government offices well matters so much to us: the offices that maintain deeds, court records, and county business can't afford systems that fail quietly or a vendor who's hard to reach.",
       "We work with public-sector and business offices in Jamestown on managed IT support, cybersecurity, Microsoft 365, networking, phones, and building security — with procurement-friendly paperwork, a local entity you can verify (Lake Cumberland Computers is a service of Stargel Technologies LLC), and a W-9 on request. If your office handles public records, ask about our free security posture report; it's a passive check of your email domain's defenses, graded in plain English.",
       "Jamestown is also the gateway to Wolf Creek Dam and the lake — which means marinas, rentals, and seasonal businesses whose busiest weeks are exactly when the internet, the card reader, or the booking computer picks to act up. We keep those systems running, and we answer the phone in season.",
-      "For homes in Jamestown, every flat-rate service on our menu is available at the posted price plus a flat $25 travel fee — shown clearly before you pay, never added after. Prefer no travel fee at all? A $49 remote support session connects a technician to your computer over a secure screen share, no driving involved.",
+      "For homes in Jamestown, every flat-rate service on our menu is available at the posted price with no travel fee — Jamestown is local for us, so the price on the menu is the price at your door. Rather not have anyone drive out at all? A $49 remote support session connects a technician to your computer over a secure screen share.",
     ],
-    travelNote: "Jamestown addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+    travelNote: "No travel fee in Jamestown — menu price is the total price, same as Russell Springs.",
   },
   {
     slug: "somerset",

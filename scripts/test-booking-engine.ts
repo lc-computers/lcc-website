@@ -128,9 +128,11 @@ async function main() {
     result = await isSlotAvailable(db, inHome, misaligned);
     check("off-grid start rejected", !result.ok && result.reason === "invalid_slot");
 
-    // 8. Travel fee rule
+    // 8. Travel fee rule — local = Russell Springs (42642) + Jamestown (42629)
     check("no fee: Russell Springs by name", travelFeeCents(inHome, "Russell Springs", "42501") === 0);
     check("no fee: zip 42642", travelFeeCents(inHome, "Somewhere", "42642") === 0);
+    check("no fee: Jamestown by name", travelFeeCents(inHome, "Jamestown", "42501") === 0);
+    check("no fee: zip 42629", travelFeeCents(inHome, "Somewhere", "42629") === 0);
     check("$25 fee: surrounding county", travelFeeCents(inHome, "Somerset", "42501") === 2500);
     check("no fee ever: remote", travelFeeCents({ kind: "remote" }, "Albany", "42602") === 0);
 

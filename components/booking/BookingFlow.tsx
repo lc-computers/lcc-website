@@ -252,8 +252,8 @@ export function BookingFlow({
               <p className="mt-5 flex items-start gap-2.5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium text-ink-900" role="status">
                 <Car className="mt-0.5 h-4 w-4 shrink-0 text-navy-700" aria-hidden="true" />
                 {fee === 0
-                  ? "Russell Springs address — no travel fee. Your total stays " + formatMoney(total) + "."
-                  : `Outside Russell Springs — a flat ${formatMoney(fee)} travel fee applies. Total: ${formatMoney(total)}.`}
+                  ? "Local address — no travel fee. Your total stays " + formatMoney(total) + "."
+                  : `Outside Russell Springs / Jamestown — a flat ${formatMoney(fee)} travel fee applies. Total: ${formatMoney(total)}.`}
               </p>
             ) : null}
             {isRemote ? (
@@ -342,7 +342,7 @@ export function BookingFlow({
                   {!isRemote ? (
                     <Row
                       label="Travel fee"
-                      value={fee === 0 ? "None — Russell Springs" : formatMoney(fee)}
+                      value={fee === 0 ? "None — local address" : formatMoney(fee)}
                     />
                   ) : null}
                   <div className="mt-2 flex items-baseline justify-between border-t border-cream-200 pt-3">

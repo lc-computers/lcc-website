@@ -29,8 +29,9 @@ export default function TermsPage() {
             <p>
               Residential services are flat-rate and paid in full online when you book, through
               Stripe. Prices are for the services themselves; no sales tax is added. In-home
-              visits outside Russell Springs add a flat $25 travel fee, which is shown clearly
-              before you pay. Remote sessions never have a travel fee.
+              visits outside Russell Springs and Jamestown (ZIP 42642 and 42629) add a flat $25
+              travel fee, which is shown clearly before you pay. Remote sessions never have a
+              travel fee.
             </p>
             <p>
               Your appointment time is confirmed when payment completes. In the rare case two
