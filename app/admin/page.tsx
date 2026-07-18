@@ -145,7 +145,7 @@ export default async function AdminPage({
         {[
           { label: "Leads", value: counts?.leads ?? 0, href: "/admin/leads" },
           { label: "Bookings", value: counts?.bookings ?? 0, href: "/admin/bookings" },
-          { label: "Health checks", value: counts?.healthChecks ?? 0, href: "/admin/leads" },
+          { label: "Health checks", value: counts?.healthChecks ?? 0, href: "/admin/health-checks" },
         ].map((s) => (
           <Link
             key={s.label}
