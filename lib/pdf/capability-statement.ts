@@ -1,11 +1,11 @@
+import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
+import { site, businessServices, type ResidentialService } from "@/lib/site";
+
 /**
- * Generates the one-page capability statement PDF into /public.
- * Run: npm run pdf:capability   (output is committed; rerun after edits)
+ * One-page capability statement, generated on demand so the residential menu
+ * always matches /admin/services. Served by
+ * app/lake-cumberland-computers-capability-statement.pdf/route.ts.
  */
-import { PDFDocument, StandardFonts, rgb, type PDFPage, type PDFFont } from "pdf-lib";
-import { writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { site, businessServices, residentialServices } from "../lib/site";
 
 const NAVY = rgb(0x0c / 255, 0x44 / 255, 0x7c / 255);
 const NAVY_DARK = rgb(0x0a / 255, 0x2c / 255, 0x50 / 255);
@@ -36,7 +36,9 @@ function wrap(text: string, font: PDFFont, size: number, maxWidth: number): stri
   return lines;
 }
 
-async function main() {
+export async function generateCapabilityStatementPdf(
+  residentialMenu: Pick<ResidentialService, "name" | "priceDisplay">[]
+): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle("Lake Cumberland Computers — Capability Statement");
   doc.setAuthor(site.legalEntity);
@@ -149,7 +151,8 @@ async function main() {
 
   y -= 10;
   y = sectionTitle("Residential (flat-rate, book online)", MARGIN, y);
-  for (const s of residentialServices) {
+  // The one-page layout fits ~8 menu rows alongside the fixed sections.
+  for (const s of residentialMenu.slice(0, 8)) {
     page.drawText(s.name, { x: MARGIN, y, size: 9, font: sans, color: INK });
     page.drawText(s.priceDisplay, {
       x: MARGIN + leftW - sansBold.widthOfTextAtSize(s.priceDisplay, 9),
@@ -255,13 +258,5 @@ async function main() {
     color: CREAM,
   });
 
-  const bytes = await doc.save();
-  const out = join(process.cwd(), "public", "lake-cumberland-computers-capability-statement.pdf");
-  writeFileSync(out, bytes);
-  console.log(`Wrote ${out} (${(bytes.length / 1024).toFixed(1)} KB)`);
+  return doc.save();
 }
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
