@@ -37,7 +37,7 @@ export default function AboutPage() {
   return (
     <>
       <section className="relative isolate overflow-hidden bg-navy-950">
-        <HeroBackdrop src="/photos/hero-lake.webp" priority variant="light" />
+        <HeroBackdrop src="/photos/hero-drive.webp" priority variant="light" />
         <Container className="py-14 sm:py-20">
           <p className="eyebrow-light">About us</p>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">

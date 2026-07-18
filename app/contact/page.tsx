@@ -22,7 +22,7 @@ export default function ContactPage() {
   return (
     <>
       <section className="relative isolate overflow-hidden bg-navy-950">
-        <HeroBackdrop src="/photos/hero-phone.webp" priority variant="light" />
+        <HeroBackdrop src="/photos/hero-workstation.webp" priority variant="light" />
         <Container className="py-14 sm:py-18">
           <p className="eyebrow-light">Contact</p>
           <h1 className="mt-3 max-w-2xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
