@@ -7,6 +7,7 @@ import { inArray } from "drizzle-orm";
 import { getDb } from "../lib/db";
 import { bookings, bookingHolds } from "../lib/db/schema";
 import { getAvailability, isSlotAvailable } from "../lib/booking/availability";
+import { getCapacity, setCapacity } from "../lib/booking/capacity";
 import { travelFeeCents } from "../lib/booking/travel-fee";
 import { getResidentialService } from "../lib/site";
 
@@ -52,6 +53,10 @@ async function main() {
     testIds.push(row!.id);
     return row!.id;
   };
+
+  // Steps 2-6 assume capacity 2; pin it and restore the admin's value after.
+  const originalCapacity = await getCapacity(db);
+  await setCapacity(db, 2);
 
   try {
     // 1. Baseline availability
@@ -128,7 +133,31 @@ async function main() {
     check("no fee: zip 42642", travelFeeCents(inHome, "Somewhere", "42642") === 0);
     check("$25 fee: surrounding county", travelFeeCents(inHome, "Somerset", "42501") === 2500);
     check("no fee ever: remote", travelFeeCents({ kind: "remote" }, "Albany", "42602") === 0);
+
+    // 9. Admin-configurable capacity: at 1 technician, a single confirmed
+    // booking fills the slot (use a third day untouched by earlier steps).
+    const soloDay = days.find(
+      (d) => d.date !== day.date && d.slots.length > 0 && (!otherDay || d.date !== otherDay.date)
+    );
+    if (!soloDay) throw new Error("need a third day with open slots to test capacity 1");
+    const soloSlot = soloDay.slots[0]!.start;
+    await setCapacity(db, 1);
+    check("setCapacity(1) persists", (await getCapacity(db)) === 1);
+    result = await isSlotAvailable(db, inHome, new Date(soloSlot));
+    check("capacity 1: empty slot still open", result.ok);
+    await mkBooking(soloSlot, "confirmed", 120);
+    result = await isSlotAvailable(db, inHome, new Date(soloSlot));
+    check("capacity 1: one booking fills the slot", !result.ok && result.reason === "slot_taken");
+    const soloDays = await getAvailability(db, inHome);
+    check(
+      "capacity 1: availability list drops it too",
+      !(soloDays.find((d) => d.date === soloDay.date)?.slots ?? []).some((s) => s.start === soloSlot)
+    );
+    await setCapacity(db, 2);
+    result = await isSlotAvailable(db, inHome, new Date(soloSlot));
+    check("back at capacity 2: same slot reopens", result.ok);
   } finally {
+    await setCapacity(db, originalCapacity);
     if (testIds.length > 0) {
       await db.delete(bookingHolds).where(inArray(bookingHolds.bookingId, testIds));
       await db.delete(bookings).where(inArray(bookings.id, testIds));

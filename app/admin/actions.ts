@@ -17,6 +17,7 @@ import {
   draftMonthlyNewsletter,
   sendNewsletter,
 } from "@/lib/content-engine";
+import { setCapacity } from "@/lib/booking/capacity";
 import { rateLimit } from "@/lib/rate-limit";
 
 async function requireAdmin(): Promise<void> {
@@ -45,6 +46,15 @@ export async function loginAction(formData: FormData): Promise<void> {
 export async function logoutAction(): Promise<void> {
   await revokeAdminCookie();
   redirect("/admin");
+}
+
+export async function updateCapacityAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const db = requireDb();
+  const n = Number(formData.get("technicians"));
+  await setCapacity(db, n);
+  revalidatePath("/admin");
+  redirect("/admin?capacity=saved");
 }
 
 export async function generateDraftAction(): Promise<void> {

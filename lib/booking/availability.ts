@@ -1,6 +1,7 @@
 import { and, eq, gt, lt, sql } from "drizzle-orm";
 import type { Db } from "@/lib/db";
 import { bookings, bookingHolds } from "@/lib/db/schema";
+import { getCapacity } from "./capacity";
 import { getBusyBlocks } from "@/lib/graph";
 import type { ResidentialService } from "@/lib/site";
 import {
@@ -19,12 +20,12 @@ import { formatTime } from "@/lib/format";
  * - In-home: 90-minute appointments on the half hour (last start 3:30 PM so the
  *   visit ends by 5:00), plus a 30-minute travel buffer blocked after each one.
  * - Remote: 30-minute slots, no buffer (last start 4:30 PM).
- * - CAPACITY = 2 concurrent jobs (two technicians). A slot is offered while
- *   fewer than 2 confirmed bookings / active holds / external busy blocks
- *   overlap it. Customers never pick a technician — assignment is internal.
+ * - Capacity = technician count, editable in /admin (default 2, see
+ *   lib/booking/capacity.ts). A slot is offered while fewer than that many
+ *   confirmed bookings / active holds / external busy blocks overlap it.
+ *   Customers never pick a technician — assignment is internal.
  */
 
-export const CAPACITY = 2;
 export const BOOKING_HORIZON_DAYS = 14;
 /** Earliest bookable slot: this far in the future. */
 export const MIN_LEAD_MS = 2 * 60 * 60 * 1000;
@@ -131,13 +132,13 @@ export async function getBusyIntervals(
   return intervals;
 }
 
-function slotIsFree(slot: SlotCandidate, busy: Interval[]): boolean {
+function slotIsFree(slot: SlotCandidate, busy: Interval[], capacity: number): boolean {
   let overlapping = 0;
   const slotInterval = { start: slot.start, end: slot.blockEnd };
   for (const b of busy) {
     if (overlaps(slotInterval, b)) {
       overlapping += 1;
-      if (overlapping >= CAPACITY) return false;
+      if (overlapping >= capacity) return false;
     }
   }
   return true;
@@ -163,6 +164,7 @@ export async function getAvailability(
   const lastDay = addDays(today, horizon);
   const rangeEnd = chicagoTimeToUtc(lastDay.year, lastDay.month, lastDay.day, 23, 59);
 
+  const capacity = await getCapacity(db);
   const busy = await getBusyIntervals(db, rangeStart, rangeEnd, {
     excludeBookingId: opts?.excludeBookingId,
   });
@@ -181,7 +183,7 @@ export async function getAvailability(
     const candidates = slotCandidatesForDay(service, day);
     const slots = candidates
       .filter((slot) => slot.start.getTime() - now.getTime() >= MIN_LEAD_MS)
-      .filter((slot) => slotIsFree(slot, busy))
+      .filter((slot) => slotIsFree(slot, busy, capacity))
       .map((slot) => ({
         start: slot.start.toISOString(),
         label: formatTime(slot.start),
@@ -213,10 +215,11 @@ export async function isSlotAvailable(
   if (!opts?.skipLeadCheck && slot.start.getTime() - Date.now() < MIN_LEAD_MS) {
     return { ok: false, reason: "too_soon" };
   }
+  const capacity = await getCapacity(db);
   const busy = await getBusyIntervals(db, slot.start, slot.blockEnd, {
     excludeBookingId: opts?.excludeBookingId,
   });
-  if (!slotIsFree(slot, busy)) return { ok: false, reason: "slot_taken" };
+  if (!slotIsFree(slot, busy, capacity)) return { ok: false, reason: "slot_taken" };
   return { ok: true, slot };
 }
 

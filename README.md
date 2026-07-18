@@ -89,7 +89,8 @@ Vercel → Project → Settings → Environment Variables (or `npx vercel env ad
 4242` → confirmation email (or console log) with ICS attachment + SMS log →
 open the manage link → cancel → refund appears automatically in Stripe test
 mode. Capacity: book the same slot twice more — the third attempt must not
-see the slot.
+see the slot (assumes the default 2 technicians; see the /admin setting
+below).
 
 Amounts are integer cents everywhere; the webhook is signature-verified and
 idempotent (`stripe_events` table), re-checks slot capacity before
@@ -170,6 +171,10 @@ land almost exactly 24h ahead.
 ## Content engine
 
 - `/admin` — enter `ADMIN_SECRET` once (30-day cookie).
+- **Scheduling capacity**: the "Technicians" number (1–4, default 2) sets how
+  many appointments can overlap one time slot. Stored in `app_settings`
+  (`technician_count`) and applied immediately to slot listings, checkout,
+  and the webhook capacity re-check. Existing bookings are never affected.
 - "Draft next topic" pulls from the 20-topic seeded queue → Claude drafts →
   review/edit → **Approve & publish** → live at `/blog/<slug>` immediately
   (blog renders from the DB; the four launch articles are seeded and also

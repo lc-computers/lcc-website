@@ -16,7 +16,9 @@ import {
   generateNewsletterAction,
   updateNewsletterAction,
   sendNewsletterAction,
+  updateCapacityAction,
 } from "./actions";
+import { getCapacity, MIN_CAPACITY, MAX_CAPACITY } from "@/lib/booking/capacity";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -91,6 +93,7 @@ export default async function AdminPage({
   }
 
   const db = getDb();
+  const capacity = await getCapacity(db);
   const [draftRows, publishedRows, newsletterRows, [counts]] = await Promise.all([
     db.select().from(posts).where(eq(posts.status, "draft")).orderBy(desc(posts.createdAt)),
     db.select().from(posts).where(eq(posts.status, "published")).orderBy(desc(posts.publishedAt)).limit(20),
@@ -131,6 +134,11 @@ export default async function AdminPage({
           Newsletter queued to {params.count ?? "0"} recipients (suppression respected; sends via the hourly cron).
         </p>
       ) : null}
+      {params.capacity === "saved" ? (
+        <p role="status" className="mt-5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium">
+          Scheduling capacity updated — the booking calendar reflects it immediately.
+        </p>
+      ) : null}
 
       {/* Stats — tiles link to the detail views */}
       <dl className="mt-8 grid grid-cols-3 gap-4">
@@ -151,6 +159,36 @@ export default async function AdminPage({
           </Link>
         ))}
       </dl>
+
+      {/* Scheduling capacity */}
+      <section className="mt-10 rounded-lg border border-cream-200 bg-white p-5 shadow-card">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-serif text-xl font-semibold text-ink-900">Scheduling capacity</h2>
+            <p className="mt-1 max-w-xl text-sm text-ink-700">
+              How many technicians are taking appointments. Each open time slot accepts this many
+              overlapping bookings — set it to 1 and every slot is single-booked; raise it when a
+              second tech is on the schedule. Applies to new bookings immediately (existing
+              bookings are never touched).
+            </p>
+          </div>
+          <form action={updateCapacityAction} className="flex shrink-0 items-center gap-3">
+            <label htmlFor="technicians" className="text-sm font-semibold text-ink-900">
+              Technicians
+            </label>
+            <input
+              id="technicians"
+              name="technicians"
+              type="number"
+              min={MIN_CAPACITY}
+              max={MAX_CAPACITY}
+              defaultValue={capacity}
+              className="w-20 rounded-md border border-cream-300 px-3 py-2 text-center text-base font-semibold focus:border-navy-500"
+            />
+            <button type="submit" className={btn}>Save</button>
+          </form>
+        </div>
+      </section>
 
       {/* Drafts */}
       <section className="mt-10">
