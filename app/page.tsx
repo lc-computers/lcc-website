@@ -58,7 +58,7 @@ export default function HomePage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             <Link
               href="/services"
-              className="group flex flex-col rounded-lg border border-navy-700 bg-navy-800 p-6 transition-colors hover:border-brass-400 hover:bg-navy-950 sm:p-8"
+              className="group flex flex-col rounded-lg border border-navy-700 bg-navy-800 p-6 transition-all hover:-translate-y-0.5 hover:border-brass-400 hover:bg-navy-950 hover:shadow-card-hover motion-reduce:hover:translate-y-0 sm:p-8"
             >
               <Building2 className="h-8 w-8 text-brass-300" aria-hidden="true" />
               <span className="mt-4 font-serif text-2xl font-semibold text-cream-50">
@@ -78,7 +78,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/book"
-              className="group flex flex-col rounded-lg border border-cream-200 bg-cream-50 p-6 transition-colors hover:border-brass-500 sm:p-8"
+              className="group flex flex-col rounded-lg border border-cream-200 bg-cream-50 p-6 transition-all hover:-translate-y-0.5 hover:border-brass-500 hover:bg-white hover:shadow-card-hover motion-reduce:hover:translate-y-0 sm:p-8"
             >
               <HomeIcon className="h-8 w-8 text-navy-700" aria-hidden="true" />
               <span className="mt-4 font-serif text-2xl font-semibold text-ink-900">
