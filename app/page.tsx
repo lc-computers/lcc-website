@@ -42,7 +42,7 @@ export default function HomePage() {
     <>
       {/* Hero + path splitter, all above the fold */}
       <section className="relative isolate overflow-hidden bg-navy-900">
-        <HeroBackdrop src="/photos/hero-rack.webp" priority />
+        <HeroBackdrop src="/photos/hero-home.webp" priority variant="light" />
         <Container className="pb-10 pt-14 sm:pb-14 sm:pt-20">
           <p className="eyebrow-light">Russell Springs, Kentucky · Since {site.foundedYear}</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">

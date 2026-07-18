@@ -256,8 +256,9 @@ async redirects() {
 - **Photos:** every `<PhotoSlot>` (home, about) marks where real photos of
   Louis, the technicians, and the shop drop in. No stock, no AI people.
   Hero backdrops in `/public/photos` are people-free hardware photography
-  from Unsplash (free commercial license; photographers: Tyler, Sebastian
-  Schuster, Jordan Harrison — attribution appreciated but not required).
+  from Unsplash (free commercial license; photographers: Paul Hanaoka,
+  Sebastian Schuster, Jordan Harrison — attribution appreciated but not
+  required).
 - **Testimonials:** `components/sections/Testimonials.tsx` has three slots
   waiting on real, permissioned quotes — fill the `slots` array.
 - **GOOGLE_REVIEW_URL** env var (see checklist).
