@@ -82,8 +82,8 @@ export default function GovernmentPage() {
       {/* Who we serve */}
       <section className="border-b border-cream-200 bg-cream-100">
         <Container className="py-10">
-          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm font-semibold text-ink-700">
-            <li className="eyebrow">Built for:</li>
+          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm font-semibold text-ink-700 lg:flex-nowrap lg:justify-between lg:gap-x-2 lg:text-xs xl:text-[0.8125rem]">
+            <li className="eyebrow shrink-0">Built for:</li>
             {[
               "County fiscal courts",
               "Clerks & PVAs",
@@ -92,7 +92,7 @@ export default function GovernmentPage() {
               "Utility districts",
               "Schools & libraries",
             ].map((entity) => (
-              <li key={entity} className="flex items-center gap-2">
+              <li key={entity} className="flex shrink-0 items-center gap-2 lg:gap-1.5">
                 <Landmark className="h-4 w-4 text-navy-600" aria-hidden="true" />
                 {entity}
               </li>
