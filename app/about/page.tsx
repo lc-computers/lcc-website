@@ -56,25 +56,34 @@ export default function AboutPage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
             <div className="space-y-5 text-base text-ink-700 sm:text-lg">
               <p>
-                In {site.foundedYear}, Louis Stargel started fixing computers for the people of
-                Russell County. The work was simple then — dead hard drives, dial-up trouble,
-                the occasional virus with a silly name. The promise was simple too:{" "}
+                In {site.foundedYear}, Louis Stargel began repairing computers for families and
+                businesses in Russell County. Technology was simpler then — most calls were
+                failed hard drives, dial-up trouble, or the occasional virus with a strange
+                name.
+              </p>
+              <p>
+                The promise was simple too:{" "}
                 <strong className="text-ink-900">
                   do good work, charge a fair price, and be here tomorrow.
                 </strong>
               </p>
               <p>
-                {yearsInBusiness()} years later the technology is unrecognizable and the promise
-                hasn&apos;t moved an inch. What started as one person is now Louis and a small
-                team of technicians. What started as house calls now includes the offices that
-                keep this region running — county and city government, medical practices, and
-                small businesses across six counties.
+                {/* Explicit space: SWC drops the plain leading space after the
+                    expression in this text node (same quirk as line 65). */}
+                {yearsInBusiness()}
+                {" years later the technology is unrecognizable. The promise hasn't moved an inch."}
               </p>
               <p>
-                We never stopped doing house calls, though. We just made them better: flat rates
-                published online, appointment times you pick yourself, payment handled before we
-                arrive, and a confirmation in your inbox. Your grandmother&apos;s computer gets
-                the same technicians the courthouse gets.
+                What started as one person making house calls is now Louis and a small team of
+                technicians, supporting the offices that keep this region running — county and
+                city government, medical practices, professional offices, and small businesses
+                across six counties.
+              </p>
+              <p>
+                We never stopped doing house calls. We just made them easier: flat rates
+                published online, appointment times you pick yourself, secure online payment,
+                and a confirmation in your inbox. Your home computer gets the same technicians
+                the courthouse gets.
               </p>
               <p>
                 The shop is at {site.address.full}. The phone number is {site.phone.display}.
