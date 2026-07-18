@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { ButtonLink } from "@/components/ui/Button";
 import { BookingsLink } from "@/components/ui/BookingsLink";
 import { FaqSection } from "@/components/sections/FaqSection";
@@ -50,7 +51,8 @@ const govFaq = [
 export default function GovernmentPage() {
   return (
     <>
-      <section className="bg-navy-950">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-cabling.webp" priority />
         <Container className="py-16 sm:py-24">
           <p className="eyebrow-light">For county &amp; city government</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">

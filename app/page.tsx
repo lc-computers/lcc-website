@@ -21,6 +21,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { TrustBar } from "@/components/sections/TrustBar";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { PhotoSlot } from "@/components/sections/PhotoSlot";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -40,7 +41,8 @@ export default function HomePage() {
   return (
     <>
       {/* Hero + path splitter, all above the fold */}
-      <section className="bg-navy-900">
+      <section className="relative isolate overflow-hidden bg-navy-900">
+        <HeroBackdrop src="/photos/hero-rack.webp" priority />
         <Container className="pb-10 pt-14 sm:pb-14 sm:pt-20">
           <p className="eyebrow-light">Russell Springs, Kentucky · Since {site.foundedYear}</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Eye, FileText, Lock, Timer } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { HealthCheckTool } from "@/components/health-check/HealthCheckTool";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { site } from "@/lib/site";
@@ -44,7 +45,8 @@ const faq = [
 export default function HealthCheckPage() {
   return (
     <>
-      <section className="border-b border-cream-200 bg-navy-950">
+      <section className="relative isolate overflow-hidden border-b border-cream-200 bg-navy-950">
+        <HeroBackdrop src="/photos/hero-patch.webp" priority />
         <Container className="py-14 sm:py-20">
           <div className="grid items-start gap-10 lg:grid-cols-2">
             <div>
