@@ -55,6 +55,20 @@ export async function POST(req: Request) {
     );
   }
 
+  // Sitewide circuit breaker: caps total AI spend even against IP rotation.
+  const globalLimit = await rateLimit({
+    name: "chat-global",
+    identifier: "site",
+    limit: 100,
+    windowSeconds: 3600,
+  });
+  if (!globalLimit.ok) {
+    return NextResponse.json(
+      { error: `Chat is busier than usual right now — call us at ${site.phone.display} and a real person will help.` },
+      { status: 429 }
+    );
+  }
+
   let json: unknown;
   try {
     json = await req.json();
