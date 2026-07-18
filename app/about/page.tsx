@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PhotoSlot } from "@/components/sections/PhotoSlot";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { site, yearsInBusiness } from "@/lib/site";
@@ -35,13 +36,14 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <section className="border-b border-cream-200 bg-cream-100">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-lake.webp" priority variant="light" />
         <Container className="py-14 sm:py-20">
-          <p className="eyebrow">About us</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-ink-900 sm:text-5xl">
+          <p className="eyebrow-light">About us</p>
+          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
             A computer shop that grew up with its county.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-ink-500">
+          <p className="mt-5 max-w-2xl text-lg text-navy-100">
             {site.name} has worked from Russell Springs since {site.foundedYear} — through
             dial-up, Windows XP, the cloud, and everything currently trying to phish your
             front office.

@@ -5,6 +5,7 @@ import Markdown from "react-markdown";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { JsonLd } from "@/components/JsonLd";
 import { articleJsonLd } from "@/lib/jsonld";
 import { getPostBySlug, getPublishedPosts } from "@/lib/blog";
@@ -47,23 +48,24 @@ export default async function BlogPostPage({
   return (
     <>
       <article>
-        <header className="border-b border-cream-200 bg-cream-100">
+        <header className="relative isolate overflow-hidden bg-navy-950">
+          <HeroBackdrop src="/photos/hero-blog.webp" priority />
           <Container className="py-14 sm:py-18">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy-700 hover:text-navy-900"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy-100 hover:text-cream-50"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               All articles
             </Link>
-            <h1 className="mt-5 max-w-3xl font-serif text-3xl font-semibold text-ink-900 sm:text-4xl">
+            <h1 className="mt-5 max-w-3xl font-serif text-3xl font-semibold text-cream-50 sm:text-4xl">
               {post.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-ink-500">{post.description}</p>
+            <p className="mt-4 max-w-2xl text-lg text-navy-100">{post.description}</p>
             {post.publishedAt ? (
               <time
                 dateTime={post.publishedAt.toISOString()}
-                className="mt-4 block text-sm font-medium text-ink-500"
+                className="mt-4 block text-sm font-medium text-navy-200"
               >
                 {formatDate(post.publishedAt)} · Lake Cumberland Computers
               </time>

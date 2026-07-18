@@ -5,6 +5,7 @@ import { Check, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { BookingsLink } from "@/components/ui/BookingsLink";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceJsonLd } from "@/lib/jsonld";
@@ -44,10 +45,11 @@ export default async function ServiceDetailPage({
 
   return (
     <>
-      <section className="border-b border-cream-200 bg-cream-100">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-circuit.webp" priority />
         <Container className="py-14 sm:py-20">
-          <p className="eyebrow">{page.heroKicker}</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-ink-900 sm:text-5xl">
+          <p className="eyebrow-light">{page.heroKicker}</p>
+          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
             {page.heroTitle}
           </h1>
         </Container>

@@ -271,10 +271,11 @@ async redirects() {
 
 - **Photos:** every `<PhotoSlot>` (home, about) marks where real photos of
   Louis, the technicians, and the shop drop in. No stock, no AI people.
-  Hero backdrops in `/public/photos` are people-free hardware photography
-  from Unsplash (free commercial license; photographers: Paul Hanaoka,
-  Sebastian Schuster, Jordan Harrison — attribution appreciated but not
-  required).
+  Hero backdrops in `/public/photos` are people-free photography from
+  Unsplash (free commercial license; attribution appreciated but not
+  required). None depict our premises or team; the lake on /about is a
+  generic lake photo used decoratively, not a shot of Lake Cumberland —
+  swap in a real one when available.
 - **Testimonials:** `components/sections/Testimonials.tsx` has three slots
   waiting on real, permissioned quotes — fill the `slots` array.
 - **GOOGLE_REVIEW_URL** env var (see checklist).

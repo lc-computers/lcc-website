@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { RegionMap } from "@/components/sections/RegionMap";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -20,13 +21,14 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="border-b border-cream-200 bg-cream-100">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-phone.webp" priority variant="light" />
         <Container className="py-14 sm:py-18">
-          <p className="eyebrow">Contact</p>
-          <h1 className="mt-3 max-w-2xl font-serif text-4xl font-semibold text-ink-900 sm:text-5xl">
+          <p className="eyebrow-light">Contact</p>
+          <h1 className="mt-3 max-w-2xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
             Talk to a person. It&apos;s kind of our thing.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-ink-500">
+          <p className="mt-5 max-w-2xl text-lg text-navy-100">
             Call during business hours and a human answers. Or send a message below and
             we&apos;ll get back to you — usually the same business day.
           </p>

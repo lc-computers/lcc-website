@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { BookingsLink } from "@/components/ui/BookingsLink";
 import { businessServices, site } from "@/lib/site";
 import { servicePages } from "@/lib/content/services";
@@ -21,13 +22,14 @@ const icons = [Wrench, ShieldCheck, Mail, Wifi, PhoneCall, Camera] as const;
 export default function ServicesPage() {
   return (
     <>
-      <section className="border-b border-cream-200 bg-cream-100">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-cabling.webp" priority />
         <Container className="py-14 sm:py-20">
-          <p className="eyebrow">Business &amp; Government Services</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-ink-900 sm:text-5xl">
+          <p className="eyebrow-light">Business &amp; Government Services</p>
+          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
             Everything an office needs to run — from one accountable local team.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-ink-500">
+          <p className="mt-5 max-w-2xl text-lg text-navy-100">
             We&apos;ve supported the offices of south-central Kentucky since {site.foundedYear}:
             county and city government, medical practices, and small businesses. No pushy sales
             process — a free consultation, a written quote, and work that speaks for itself.

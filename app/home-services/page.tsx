@@ -15,6 +15,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PhoneLink } from "@/components/ui/PhoneLink";
 import { Reveal } from "@/components/ui/Reveal";
 import { Testimonials } from "@/components/sections/Testimonials";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceJsonLd } from "@/lib/jsonld";
@@ -98,26 +99,27 @@ export default async function HomeServicesPage() {
   const menu = await getServiceMenu();
   return (
     <>
-      <section className="border-b border-cream-200 bg-cream-100">
+      <section className="relative isolate overflow-hidden bg-navy-950">
+        <HeroBackdrop src="/photos/hero-desk.webp" priority variant="light" />
         <Container className="py-14 sm:py-20">
-          <p className="eyebrow">For your home</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-ink-900 sm:text-5xl">
+          <p className="eyebrow-light">For your home</p>
+          <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
             Tech help at your house, at a price you saw coming.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-ink-500">
+          <p className="mt-5 max-w-2xl text-lg text-navy-100">
             Flat rates, real appointment times, and online payment — from the same local
             technicians who look after the region&apos;s offices. Pick a service below and
             you can be booked in about two minutes.
           </p>
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <ButtonLink href="/book" className="px-8 py-3.5 text-base">
+            <ButtonLink href="/book" variant="brass" className="px-8 py-3.5 text-base">
               Book now
             </ButtonLink>
-            <p className="text-sm font-medium text-ink-700">
+            <p className="text-sm font-medium text-navy-100">
               Prefer to call?{" "}
               <PhoneLink
                 location="home_services_hero"
-                className="font-bold text-navy-700 underline decoration-brass-400 underline-offset-4 hover:text-navy-900"
+                className="font-bold text-cream-50 underline decoration-brass-400 underline-offset-4 hover:text-brass-300"
               />
             </p>
           </div>
