@@ -78,7 +78,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/book"
-              className="group flex flex-col rounded-lg border border-cream-200 bg-cream-50 p-6 transition-all hover:-translate-y-0.5 hover:border-brass-500 hover:bg-white hover:shadow-card-hover motion-reduce:hover:translate-y-0 sm:p-8"
+              className="group flex flex-col rounded-lg border border-cream-200 bg-cream-50 p-6 transition-all hover:-translate-y-0.5 hover:border-brass-500 hover:bg-cream-200 hover:shadow-card-hover motion-reduce:hover:translate-y-0 sm:p-8"
             >
               <HomeIcon className="h-8 w-8 text-navy-700" aria-hidden="true" />
               <span className="mt-4 font-serif text-2xl font-semibold text-ink-900">
