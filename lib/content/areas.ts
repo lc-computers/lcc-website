@@ -108,6 +108,86 @@ export const areaPages: AreaPage[] = [
     ],
     travelNote: "Albany addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
   },
+  {
+    slug: "campbellsville",
+    town: "Campbellsville",
+    county: "Taylor",
+    metaTitle: "Computer & IT Services in Campbellsville, KY",
+    metaDescription:
+      "Managed IT, Microsoft 365, and cybersecurity for Campbellsville and Taylor County offices — plus flat-rate in-home computer help booked and paid online.",
+    heroTitle: "Campbellsville and Taylor County, within reach.",
+    paragraphs: [
+      "Campbellsville is the northwest corner of our service area — the Taylor County seat, up KY-55 from Columbia, with Green River Lake at its doorstep. For a town its size it carries a lot of economy: a university, a hospital, distribution and manufacturing payrolls, and the professional offices, clinics, and shops that grow up around all of them.",
+      "That mix produces exactly the kind of offices we work with every day: businesses big enough that email security, backups, and network reliability genuinely matter, but not big enough to justify a full-time IT department. We support Campbellsville offices with managed IT, Microsoft 365 done properly, practical cybersecurity, network and Wi-Fi installation, VoIP phone systems, and camera and door-access systems — with a local vendor's accountability behind every install.",
+      "Public-sector offices in Taylor County get the same procurement-friendly footing we offer every government client: a verifiable local legal entity (Lake Cumberland Computers is a service of Stargel Technologies LLC), a W-9 on request, written quotes that respect a budget cycle, and a free security posture report — a passive, plain-English grading of your email domain's public security records, no access to your systems required.",
+      "For Campbellsville homes, the full flat-rate menu applies — $99 in-home tech help, $149 virus removal, $129 new-computer setup or Wi-Fi fix — at the posted price plus a flat $25 travel fee, shown clearly before you pay. Or skip the drive: a $49 remote support session puts a technician on your screen at a confirmed appointment time, with no travel fee at all.",
+    ],
+    travelNote: "Campbellsville addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+  },
+  {
+    slug: "liberty",
+    town: "Liberty",
+    county: "Casey",
+    metaTitle: "Computer & IT Services in Liberty, KY",
+    metaDescription:
+      "IT support for Liberty and Casey County, KY — county offices, farms, and small businesses, plus flat-rate in-home computer help and $49 remote support.",
+    heroTitle: "Liberty and Casey County — closer than you'd think.",
+    paragraphs: [
+      "Liberty sits north of us on US-127 — the Casey County seat, in some of the best farm country in south-central Kentucky. It's easy to assume a town like Liberty is off every IT company's map. It isn't off ours; Casey County has been part of our stated service area from the start, and 127 is a road we know well.",
+      "Casey County's economy is more computerized than it looks from the road. Farms run on spreadsheets, market apps, and equipment that phones home. Sawmills, small manufacturers, and ag businesses run payroll, invoicing, and inventory on machines nobody has time to babysit. And the county's offices — courthouse, clerk, schools' vendors, clinics — handle records that deserve the same protection as any city agency's. We support all of it: managed IT, Microsoft 365, practical cybersecurity, networking, phones, and cameras, with written quotes and straight answers.",
+      "For government offices in Liberty, we speak procurement: a verifiable local entity, W-9 on request, and a free security posture report that grades your email domain's public security records in plain English — the kind of document that's genuinely useful to hand a magistrate or a fiscal court when the subject of cybersecurity comes up.",
+      "For homes in Liberty and around Casey County, every service on our flat-rate menu is available at the posted price plus a flat $25 travel fee, shown before you pay — and the $49 remote session skips the travel fee entirely. Book online, pick a real time slot, and a technician calls or knocks exactly when it says they will.",
+    ],
+    travelNote: "Liberty addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+  },
+  {
+    slug: "burkesville",
+    town: "Burkesville",
+    county: "Cumberland",
+    metaTitle: "Computer & IT Services in Burkesville, KY",
+    metaDescription:
+      "IT support and in-home computer help for Burkesville and Cumberland County, KY — near Dale Hollow Lake. Business IT, flat-rate home services, remote support.",
+    heroTitle: "Burkesville and Cumberland County — we make the drive.",
+    paragraphs: [
+      "Burkesville sits on a bend of the Cumberland River — the Cumberland County seat, down in the far southwest of our service area with Dale Hollow Lake close by. Towns this size, this far from an interstate, get told \"that's outside our area\" by nearly every service company they call. We're the exception on purpose: if you're in Cumberland County, you're in our coverage.",
+      "Burkesville's offices — county and city government, the clerk's records, clinics, banks-adjacent businesses, and the marinas and outfitters that work Dale Hollow's seasons — need the same fundamentals as any office anywhere: email that can't be spoofed, backups that actually restore, a network that stays up, and a vendor who answers the phone. We provide managed IT, Microsoft 365, cybersecurity, networking, business phones, and camera systems, backed by a local legal entity you can verify and a W-9 on request.",
+      "Distance is also why remote support carries so much of the load out here. A $49 remote session gets a technician on your screen at a confirmed appointment time — no travel fee, no waiting on a truck — and it resolves a surprising share of everyday problems: email trouble, slow computers, software questions, printers being printers. For business clients, most month-to-month support happens the same way, with on-site visits scheduled when a job needs hands.",
+      "When it does need hands, we drive to Burkesville. In-home services run at the posted flat rate plus a flat $25 travel fee — the total, travel included, is on the screen before you pay anything. Book online in about two minutes, or call the shop and talk to a person.",
+    ],
+    travelNote: "Burkesville addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+  },
+  {
+    slug: "greensburg",
+    town: "Greensburg",
+    county: "Green",
+    metaTitle: "Computer & IT Services in Greensburg, KY",
+    metaDescription:
+      "IT support for Greensburg and Green County, KY — government offices, farms, and small businesses, plus flat-rate in-home computer help booked online.",
+    heroTitle: "Greensburg and Green County, on our route.",
+    paragraphs: [
+      "Greensburg is the Green County seat, set along the Green River with one of the oldest courthouse buildings in Kentucky anchoring its downtown. A town that's kept its records intact for over two centuries understands something a lot of bigger places forget: continuity matters. The office that maintains deeds and county business can't afford systems that quietly fail — or a vendor who's impossible to reach when they do.",
+      "We support Green County offices — courthouse and county departments, clinics, farm businesses, and the small shops and professional offices around the square — with managed IT, Microsoft 365, practical cybersecurity, network and Wi-Fi work, VoIP phones, and camera systems. Everything comes with a written quote, a local entity you can verify (Lake Cumberland Computers is a service of Stargel Technologies LLC), and a W-9 on request.",
+      "If your office runs on Microsoft 365 — or you're not entirely sure what your email is running on — start with our free security posture report. Enter your domain and in about fifteen seconds you get letter grades on the public records that determine whether your organization's email can be impersonated, explained in plain English for a clerk or office manager, not a technician. It's passive, free, and requires no access to your systems.",
+      "For homes in Greensburg and around Green County, our flat-rate menu — $99 in-home tech help, $149 virus removal, $129 new-computer setup or Wi-Fi fix — applies at the posted price plus a flat $25 travel fee, always displayed before you pay. Prefer nobody makes the drive? The $49 remote session has no travel fee: a technician calls at your appointment time and fixes it over a secure screen share.",
+    ],
+    travelNote: "Greensburg addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+  },
+  {
+    slug: "whitley-city",
+    town: "Whitley City",
+    county: "McCreary",
+    metaTitle: "Computer & IT Services in Whitley City, KY",
+    metaDescription:
+      "IT support for Whitley City and McCreary County, KY — government offices and businesses along US-27, plus flat-rate in-home computer help and remote support.",
+    heroTitle: "Whitley City and McCreary County — covered, not forgotten.",
+    paragraphs: [
+      "Whitley City is the seat of McCreary County, down US-27 south of Somerset, surrounded by the Daniel Boone National Forest and the Big South Fork country. McCreary is famously the only county in Kentucky without an incorporated city — which tells you something true about the area: it's rural, it's independent, and it's used to being skipped over by service companies working out of bigger towns. We don't skip it.",
+      "The offices that keep McCreary County running — county government, the clerk's records, school-system vendors, clinics, and the outfitters and businesses that work the trail and river seasons — depend on the same systems as offices anywhere: email, backups, networks, phones. We support them with managed IT, Microsoft 365, practical cybersecurity, networking and Wi-Fi, VoIP phone systems, and cameras, with procurement-friendly paperwork and a verifiable local entity behind every quote.",
+      "Because Whitley City is at the far edge of our map, remote support does a lot of the day-to-day work. A $49 remote session connects a technician to your computer over a secure screen share at a confirmed appointment time — no travel fee, ever — and handles most everyday problems the same day: email trouble, slow machines, software questions, printer fights. Business clients get the same treatment: most support handled remotely, on-site visits scheduled when hardware needs hands.",
+      "And when hands are needed, we make the drive down 27. In-home services in Whitley City and around McCreary County run at the posted flat rate plus a flat $25 travel fee, shown in full before you pay. Book online, pick a real time slot, and a technician arrives when the confirmation says they will — or call the shop and a local person will sort it out with you.",
+    ],
+    travelNote: "Whitley City addresses add a flat $25 travel fee, shown before you pay. Remote sessions have no travel fee, ever.",
+  },
 ];
 
 export function getAreaPage(slug: string): AreaPage | undefined {

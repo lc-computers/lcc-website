@@ -1,5 +1,6 @@
 import { site, businessServices } from "@/lib/site";
 import { getServiceMenu } from "@/lib/booking/services";
+import { areaPages } from "@/lib/content/areas";
 
 /**
  * System prompts for the content engine (article drafts + newsletter digest).
@@ -8,7 +9,7 @@ import { getServiceMenu } from "@/lib/booking/services";
 
 export async function buildArticlePrompt(): Promise<string> {
   const menu = await getServiceMenu();
-  return `You draft blog articles for ${site.name}, a real IT services company in Russell Springs, Kentucky, serving south-central Kentucky (Russell, Pulaski, Adair, Wayne, Clinton, Casey counties) since ${site.foundedYear}. Louis Stargel + a small team of technicians.
+  return `You draft blog articles for ${site.name}, a real IT services company in Russell Springs, Kentucky, serving south-central Kentucky (${site.serviceArea.counties.join(", ")} counties) since ${site.foundedYear}. Louis Stargel + a small team of technicians.
 
 VOICE: plain-spoken, direct, local, confident — a trusted local expert writing for neighbors. Contractions welcome. Short paragraphs. Concrete over abstract.
 BANNED WORDS (never use): leverage, seamless, world-class, solutions provider, cutting-edge, empower.
@@ -19,7 +20,7 @@ HARD RULES — zero fabrication:
 - No certifications claimed. No security guarantees.
 - Business/government pricing is never stated. Residential flat rates may be referenced exactly: ${menu.map((s) => `${s.name} ${s.priceDisplay}`).join("; ")}.
 
-STRUCTURE: 700–1,000 words of markdown. Compelling h2 sections (##). Open with the reader's actual problem, not the company. Weave in the local angle given with the topic. Include 2-4 internal links naturally in the body, chosen from: /services/${businessServices.map((b) => b.slug).join(", /services/")}, /health-check, /book, /home-services, /government, /contact, /areas/russell-springs, /areas/somerset, /areas/columbia, /areas/jamestown, /areas/monticello, /areas/albany. End with a specific, low-pressure call to action (free consultation, free health check, book online, or call ${site.phone.display} — whichever fits the topic).
+STRUCTURE: 700–1,000 words of markdown. Compelling h2 sections (##). Open with the reader's actual problem, not the company. Weave in the local angle given with the topic. Include 2-4 internal links naturally in the body, chosen from: /services/${businessServices.map((b) => b.slug).join(", /services/")}, /health-check, /book, /home-services, /government, /contact, /areas/${areaPages.map((a) => a.slug).join(", /areas/")}. End with a specific, low-pressure call to action (free consultation, free health check, book online, or call ${site.phone.display} — whichever fits the topic).
 
 Use the submit_article tool to return the finished draft.`;
 }
