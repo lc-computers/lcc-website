@@ -23,9 +23,14 @@ export function Wordmark({
         <span className={`font-serif text-lg font-semibold leading-none tracking-tight ${line1}`}>
           Lake Cumberland
         </span>
+        {/* Width-matched to "Lake Cumberland" (147.8px @ 18px): 13px ×
+            (6.40em glyphs + 8 × 0.621em gaps) ≈ 147.8. The negative
+            margin-right cancels the trailing letter-space so the S sits
+            flush right. Brand rule: below ~28px lockup height, drop this
+            line entirely — never render it smaller than this ratio. */}
         <span
-          className={`mt-1 font-sans text-[0.6rem] font-bold uppercase leading-none ${line2}`}
-          style={{ letterSpacing: "0.34em" }}
+          className={`mt-[5px] font-sans text-[0.8125rem] font-bold uppercase leading-none ${line2}`}
+          style={{ letterSpacing: "0.621em", marginRight: "-0.621em" }}
         >
           Computers
         </span>
