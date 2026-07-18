@@ -52,7 +52,7 @@ export default function GovernmentPage() {
   return (
     <>
       <section className="relative isolate overflow-hidden bg-navy-950">
-        <HeroBackdrop src="/photos/hero-cabling.webp" priority />
+        <HeroBackdrop src="/photos/hero-government.webp" priority />
         <Container className="py-16 sm:py-24">
           <p className="eyebrow-light">For county &amp; city government</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl font-semibold text-cream-50 sm:text-5xl">
