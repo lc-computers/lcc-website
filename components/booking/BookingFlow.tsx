@@ -34,7 +34,6 @@ const emptyDetails: Details = {
 const inputCls =
   "w-full rounded-md border border-cream-300 bg-white px-4 py-3 text-base text-ink-900 placeholder:text-ink-500/50 focus:border-navy-500";
 
-const stepTitles = ["Service", "Your details", "Pick a time", "Review & pay"];
 
 export function BookingFlow({
   services,
@@ -62,6 +61,9 @@ export function BookingFlow({
   const total = (service?.priceCents ?? 0) + fee;
   const isRemote = service?.kind === "remote";
   const showFee = service && !isRemote && details.city.trim().length >= 3;
+  // Free promo ($0 total): no payment step — booking confirms instantly.
+  const isFree = service !== null && total === 0;
+  const stepTitles = ["Service", "Your details", "Pick a time", isFree ? "Review & confirm" : "Review & pay"];
 
   function choose(s: ResidentialService) {
     setService(s);
@@ -252,14 +254,17 @@ export function BookingFlow({
               <p className="mt-5 flex items-start gap-2.5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium text-ink-900" role="status">
                 <Car className="mt-0.5 h-4 w-4 shrink-0 text-navy-700" aria-hidden="true" />
                 {fee === 0
-                  ? "Local address — no travel fee. Your total stays " + formatMoney(total) + "."
+                  ? total === 0
+                    ? "Local address — no travel fee, and this service is free. Nothing to pay."
+                    : "Local address — no travel fee. Your total stays " + formatMoney(total) + "."
                   : `Outside Russell Springs / Jamestown — a flat ${formatMoney(fee)} travel fee applies. Total: ${formatMoney(total)}.`}
               </p>
             ) : null}
             {isRemote ? (
               <p className="mt-5 flex items-start gap-2.5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium text-ink-900">
                 <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-navy-700" aria-hidden="true" />
-                Remote session — no address needed and never a travel fee. Total: {formatMoney(total)}.
+                Remote session — no address needed and never a travel fee.{" "}
+                {total === 0 ? "Free — nothing to pay." : `Total: ${formatMoney(total)}.`}
               </p>
             ) : null}
 
@@ -338,7 +343,10 @@ export function BookingFlow({
                 />
                 <Row label="Name" value={details.name} />
                 <div className="border-t border-cream-200 pt-3">
-                  <Row label={service.name} value={formatMoney(service.priceCents)} />
+                  <Row
+                    label={service.name}
+                    value={service.priceCents === 0 ? "Free" : formatMoney(service.priceCents)}
+                  />
                   {!isRemote ? (
                     <Row
                       label="Travel fee"
@@ -348,7 +356,7 @@ export function BookingFlow({
                   <div className="mt-2 flex items-baseline justify-between border-t border-cream-200 pt-3">
                     <dt className="font-serif text-lg font-semibold text-ink-900">Total due now</dt>
                     <dd className="font-serif text-2xl font-semibold text-navy-700">
-                      {formatMoney(total)}
+                      {total === 0 ? "Free" : formatMoney(total)}
                     </dd>
                   </div>
                 </div>
@@ -366,6 +374,11 @@ export function BookingFlow({
                     <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
                     Reserving your slot…
                   </>
+                ) : isFree ? (
+                  <>
+                    <BadgeCheck className="h-4 w-4" aria-hidden="true" />
+                    Confirm my free booking
+                  </>
                 ) : (
                   <>
                     <Lock className="h-4 w-4" aria-hidden="true" />
@@ -374,7 +387,9 @@ export function BookingFlow({
                 )}
               </button>
               <p className="mt-3 text-center text-xs text-ink-500">
-                Secure payment by Stripe. We never see your card number.
+                {isFree
+                  ? "No payment needed — no card, no charge."
+                  : "Secure payment by Stripe. We never see your card number."}
               </p>
             </div>
             <div className="mt-6">

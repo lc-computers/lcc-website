@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { isAdmin } from "@/lib/admin/auth";
 import { hasDb } from "@/lib/db";
 import { loadCatalog, type CatalogService } from "@/lib/booking/services";
+import { DeleteServiceButton } from "@/components/admin/DeleteServiceButton";
 import { saveServiceAction } from "../actions";
 
 export const metadata: Metadata = {
@@ -191,8 +192,10 @@ export default async function AdminServicesPage({
       <p className="mt-2 max-w-2xl text-sm text-ink-700">
         This menu drives the whole site: the booking flow, the prices on the home and
         home-services pages, and what the chat assistant recommends and quotes. Changes go live
-        immediately. Existing bookings always keep the price the customer already paid. Instead of
-        deleting a service, uncheck &ldquo;Bookable&rdquo; — past bookings still need its name.
+        immediately. Existing bookings always keep the price the customer already paid. A service
+        with bookings on record can&rsquo;t be deleted (past bookings still need its name) — uncheck
+        &ldquo;Bookable&rdquo; to take it off the menu instead. Set a price of $0 to run a free
+        promotion: customers book normally but skip payment entirely.
       </p>
 
       {params.error ? (
@@ -203,6 +206,11 @@ export default async function AdminServicesPage({
       {params.saved ? (
         <p role="status" className="mt-5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium">
           Saved — the site and booking flow show it now.
+        </p>
+      ) : null}
+      {params.deleted ? (
+        <p role="status" className="mt-5 rounded-md border border-navy-200 bg-navy-50 px-4 py-3 text-sm font-medium">
+          Deleted — it&rsquo;s gone from the site and booking flow.
         </p>
       ) : null}
 
@@ -235,6 +243,9 @@ export default async function AdminServicesPage({
                 Booking link: /book?service={s.slug}
               </p>
               <ServiceForm service={s} />
+              <div className="mt-5 border-t border-cream-200 pt-4">
+                <DeleteServiceButton slug={s.slug} name={s.name} />
+              </div>
             </div>
           </details>
         ))}

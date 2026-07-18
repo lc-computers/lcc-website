@@ -35,13 +35,25 @@ async function loadBooking(sessionId: string) {
   return row ?? null;
 }
 
+/** Free bookings confirm synchronously — no Stripe session, just the manage token. */
+async function loadBookingByToken(token: string) {
+  if (!hasDb()) return null;
+  const db = getDb();
+  const [row] = await db.select().from(bookings).where(eq(bookings.manageToken, token));
+  return row ?? null;
+}
+
 export default async function BookingSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ session_id?: string }>;
+  searchParams: Promise<{ session_id?: string; bt?: string }>;
 }) {
-  const { session_id: sessionId } = await searchParams;
-  const booking = sessionId ? await loadBooking(sessionId) : null;
+  const { session_id: sessionId, bt } = await searchParams;
+  const booking = bt
+    ? await loadBookingByToken(bt)
+    : sessionId
+      ? await loadBooking(sessionId)
+      : null;
   const service = booking
     ? await findService(booking.serviceSlug, { includeInactive: true })
     : null;
@@ -95,11 +107,13 @@ export default async function BookingSuccessPage({
                 {service.name} — <strong>{formatDateTime(booking.startAt)}</strong>
               </p>
               <p className="mt-2 text-sm text-ink-500">
-                {formatMoney(booking.totalCents)} paid
-                {booking.travelFeeCents > 0
-                  ? ` (includes ${formatMoney(booking.travelFeeCents)} travel fee)`
-                  : ""}
-                .
+                {booking.totalCents === 0
+                  ? "No charge — this appointment is free."
+                  : `${formatMoney(booking.totalCents)} paid${
+                      booking.travelFeeCents > 0
+                        ? ` (includes ${formatMoney(booking.travelFeeCents)} travel fee)`
+                        : ""
+                    }.`}
               </p>
               {confirmed ? (
                 <p className="mt-4 text-base text-ink-700">

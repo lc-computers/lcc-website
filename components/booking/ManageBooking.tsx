@@ -12,11 +12,14 @@ export function ManageBooking({
   bookingId,
   serviceSlug,
   canCancelOnline,
+  paid,
 }: {
   token: string;
   bookingId: string;
   serviceSlug: string;
   canCancelOnline: boolean;
+  /** False for $0 promo bookings — no refund language anywhere. */
+  paid: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("view");
   const [slot, setSlot] = useState<SelectedSlot | null>(null);
@@ -63,10 +66,13 @@ export function ManageBooking({
   if (mode === "done-cancel") {
     return (
       <div role="status" className="rounded-lg border border-navy-200 bg-navy-50 p-6 text-center">
-        <h2 className="font-serif text-2xl font-semibold text-ink-900">Canceled — refund issued.</h2>
+        <h2 className="font-serif text-2xl font-semibold text-ink-900">
+          {paid ? "Canceled — refund issued." : "Canceled."}
+        </h2>
         <p className="mt-2 text-base text-ink-700">
-          Your full refund is on its way to your original payment method (allow 5–10 business
-          days). A confirmation email is headed your way too.
+          {paid
+            ? "Your full refund is on its way to your original payment method (allow 5–10 business days). A confirmation email is headed your way too."
+            : "Your appointment is canceled — there was no charge, so there's nothing to refund. A confirmation email is headed your way."}
         </p>
       </div>
     );
@@ -108,7 +114,7 @@ export function ManageBooking({
               className="inline-flex items-center justify-center gap-2 rounded-md border border-cream-300 px-6 py-3 text-sm font-semibold text-ink-700 hover:border-brass-500 hover:text-ink-900"
             >
               <XCircle className="h-4 w-4" aria-hidden="true" />
-              Cancel & refund
+              {paid ? "Cancel & refund" : "Cancel appointment"}
             </button>
           ) : (
             <p className="flex items-center text-sm text-ink-500">
@@ -127,8 +133,9 @@ export function ManageBooking({
             Cancel this appointment?
           </h2>
           <p className="mt-2 text-sm text-ink-700">
-            You&apos;ll get a full, automatic refund to your original payment method. This
-            can&apos;t be undone — but you can always book again.
+            {paid
+              ? "You'll get a full, automatic refund to your original payment method. This can't be undone — but you can always book again."
+              : "There was no charge for this booking, so there's nothing to refund. This can't be undone — but you can always book again."}
           </p>
           <div className="mt-5 flex gap-3">
             <button
@@ -137,7 +144,7 @@ export function ManageBooking({
               className="inline-flex items-center gap-2 rounded-md bg-navy-700 px-6 py-3 text-sm font-semibold text-cream-50 hover:bg-navy-800 disabled:opacity-60"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-              Yes — cancel & refund
+              {paid ? "Yes — cancel & refund" : "Yes — cancel it"}
             </button>
             <button
               onClick={() => setMode("view")}

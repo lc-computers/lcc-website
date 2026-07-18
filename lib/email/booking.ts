@@ -11,7 +11,7 @@ function manageUrl(booking: BookingRow): string {
 
 function detailsPanel(booking: BookingRow, service: ResidentialService): string {
   const rows: string[] = [
-    `<strong>${escapeHtml(service.name)}</strong> — ${formatMoney(booking.totalCents)}${
+    `<strong>${escapeHtml(service.name)}</strong> — ${booking.totalCents === 0 ? "Free" : formatMoney(booking.totalCents)}${
       booking.travelFeeCents > 0
         ? ` <span style="color:#4C5D76;">(includes ${formatMoney(booking.travelFeeCents)} travel fee)</span>`
         : ""
@@ -56,7 +56,9 @@ ${emailHeading(opts?.rescheduled ? "Your new time is confirmed." : `You're booke
 <p>${
       opts?.rescheduled
         ? "Here are your updated appointment details:"
-        : "Payment received, appointment locked in. Here's everything:"
+        : booking.totalCents === 0
+          ? "No charge for this one — appointment locked in. Here's everything:"
+          : "Payment received, appointment locked in. Here's everything:"
     }</p>
 ${detailsPanel(booking, service)}
 ${whatToExpect(service)}

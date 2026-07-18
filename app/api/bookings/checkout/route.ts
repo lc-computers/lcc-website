@@ -6,6 +6,7 @@ import { bookings, bookingHolds, leads } from "@/lib/db/schema";
 import { isSlotAvailable, withSlotLock } from "@/lib/booking/availability";
 import { travelFeeCents } from "@/lib/booking/travel-fee";
 import { findService } from "@/lib/booking/services";
+import { runConfirmationEffects } from "@/lib/booking/actions";
 import { site } from "@/lib/site";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
@@ -82,17 +83,25 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!hasDb() || !isStripeConfigured()) {
+  if (!hasDb()) {
     return NextResponse.json({ error: CALL_US }, { status: 503 });
   }
 
   const start = new Date(input.start);
   const fee = travelFeeCents(service, input.city, input.zip);
   const total = service.priceCents + fee;
+  // Free promos ($0 total) skip Stripe entirely — no card, no webhook.
+  const isFree = total === 0;
+  if (!isFree && !isStripeConfigured()) {
+    return NextResponse.json({ error: CALL_US }, { status: 503 });
+  }
   const db = getDb();
 
   // Reserve the slot: capacity check + booking + 15-minute hold, serialized
   // per calendar day via an advisory lock so two checkouts can't both pass.
+  // Free bookings confirm right here — a confirmed row occupies capacity
+  // itself, so no hold (and no webhook) is needed.
+  const manageToken = randomToken(24);
   let bookingId: string;
   try {
     const reserved = await db.transaction(async (tx) => {
@@ -105,7 +114,8 @@ export async function POST(req: Request) {
           .insert(bookings)
           .values({
             serviceSlug: service.slug,
-            status: "pending_payment",
+            status: isFree ? "confirmed" : "pending_payment",
+            ...(isFree ? { confirmedAt: new Date() } : {}),
             customerName: input.name,
             email: input.email.toLowerCase(),
             phone: input.phone,
@@ -119,16 +129,18 @@ export async function POST(req: Request) {
             startAt: check.slot.start,
             endAt: check.slot.end,
             blockEndAt: check.slot.blockEnd,
-            manageToken: randomToken(24),
+            manageToken,
           })
           .returning({ id: bookings.id });
         if (!booking) throw new Error("insert returned no row");
-        await tx.insert(bookingHolds).values({
-          bookingId: booking.id,
-          startAt: check.slot.start,
-          blockEndAt: check.slot.blockEnd,
-          expiresAt: new Date(Date.now() + HOLD_MINUTES * 60_000),
-        });
+        if (!isFree) {
+          await tx.insert(bookingHolds).values({
+            bookingId: booking.id,
+            startAt: check.slot.start,
+            blockEndAt: check.slot.blockEnd,
+            expiresAt: new Date(Date.now() + HOLD_MINUTES * 60_000),
+          });
+        }
         return { id: booking.id } as const;
       });
     });
@@ -152,11 +164,26 @@ export async function POST(req: Request) {
       email: input.email.toLowerCase(),
       phone: input.phone,
       source: "booking",
-      message: `Started checkout: ${service.name} for ${formatDateTime(start)}`,
+      message: isFree
+        ? `Booked (free promo): ${service.name} for ${formatDateTime(start)}`
+        : `Started checkout: ${service.name} for ${formatDateTime(start)}`,
       meta: { bookingId, service: service.slug },
     });
   } catch (err) {
     console.error("checkout: lead insert failed (continuing)", err);
+  }
+
+  // Free booking: already confirmed above — fire the confirmation effects
+  // (email + ICS, SMS, Graph event, internal notify) and skip Stripe.
+  if (isFree) {
+    try {
+      const [confirmed] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+      if (confirmed) await runConfirmationEffects(db, confirmed);
+    } catch (err) {
+      // Booking is confirmed either way — never fail the customer here.
+      console.error("checkout: free-booking confirmation effects failed", err);
+    }
+    return NextResponse.json({ url: `${site.url}/book/success?bt=${manageToken}` });
   }
 
   // Stripe Checkout session (30 min expiry — Stripe's minimum; our own hold

@@ -108,9 +108,15 @@ export async function runConfirmationEffects(
   // Internal notification
   await notifyLead({
     source: "Booking",
-    subject: `${opts?.rescheduled ? "Rescheduled" : "New paid booking"}: ${service.name} — ${formatDateTime(booking.startAt)}`,
+    subject: `${
+      opts?.rescheduled
+        ? "Rescheduled"
+        : booking.totalCents === 0
+          ? "New booking (free promo)"
+          : "New paid booking"
+    }: ${service.name} — ${formatDateTime(booking.startAt)}`,
     fields: {
-      Service: `${service.name} (${formatMoney(booking.totalCents)})`,
+      Service: `${service.name} (${booking.totalCents === 0 ? "Free" : formatMoney(booking.totalCents)})`,
       When: `${formatDateTime(booking.startAt)} – ${formatTime(booking.endAt)}`,
       Customer: booking.customerName,
       Phone: booking.phone,
@@ -178,10 +184,11 @@ export async function loseRace(db: Db, booking: BookingRow): Promise<void> {
   });
 }
 
-/** Customer-initiated cancel (≥24h) — auto-refund via Stripe. */
+/** Customer-initiated cancel (≥24h) — auto-refund via Stripe ($0 bookings have nothing to refund). */
 export async function cancelBookingWithRefund(db: Db, booking: BookingRow): Promise<boolean> {
   const service = await serviceForBooking(booking);
-  const refunded = await refundBookingPayment(booking);
+  const nothingToRefund = booking.totalCents === 0;
+  const refunded = nothingToRefund ? false : await refundBookingPayment(booking);
   await db
     .update(bookings)
     .set({
@@ -204,7 +211,11 @@ export async function cancelBookingWithRefund(db: Db, booking: BookingRow): Prom
       Customer: booking.customerName,
       Phone: booking.phone,
       Slot: formatDateTime(booking.startAt),
-      Refund: refunded ? `Issued automatically (${formatMoney(booking.totalCents)})` : "FAILED — issue manually in Stripe",
+      Refund: nothingToRefund
+        ? "Not needed — free booking"
+        : refunded
+          ? `Issued automatically (${formatMoney(booking.totalCents)})`
+          : "FAILED — issue manually in Stripe",
     },
   });
   return refunded;

@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, hasDb } from "@/lib/db";
-import { posts, newsletters, services } from "@/lib/db/schema";
+import { posts, newsletters, services, bookings } from "@/lib/db/schema";
 import {
   grantAdminCookie,
   revokeAdminCookie,
@@ -159,6 +159,43 @@ export async function saveServiceAction(formData: FormData): Promise<void> {
 
   revalidateServicePages();
   redirect(`/admin/services?saved=${encodeURIComponent(slug)}`);
+}
+
+export async function deleteServiceAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const db = requireDb();
+  const slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) redirect("/admin/services?error=Missing+service");
+
+  // Bookings keep a foreign key to the service — history must stay intact.
+  const [referenced] = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(eq(bookings.serviceSlug, slug))
+    .limit(1);
+  if (referenced) {
+    redirect(
+      `/admin/services?error=${encodeURIComponent(
+        'This service has bookings on record, so it can’t be deleted — uncheck "Bookable" to take it off the menu instead.'
+      )}`
+    );
+  }
+
+  // An empty services table makes the site fall back to the built-in seed
+  // menu, silently resurrecting the original five services.
+  const remaining = await db.select({ slug: services.slug }).from(services).limit(2);
+  if (remaining.length <= 1) {
+    redirect(
+      "/admin/services?error=" +
+        encodeURIComponent(
+          "You can't delete the last service — the site would fall back to the original built-in menu. Add or edit instead."
+        )
+    );
+  }
+
+  await db.delete(services).where(eq(services.slug, slug));
+  revalidateServicePages();
+  redirect("/admin/services?deleted=1");
 }
 
 export async function generateDraftAction(): Promise<void> {

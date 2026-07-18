@@ -64,10 +64,13 @@ export default async function ManageBookingPage({
             <div className="flex justify-between gap-4">
               <dt className="text-sm font-semibold text-ink-500">Paid</dt>
               <dd className="text-right font-medium text-ink-900">
-                {formatMoney(booking.totalCents)}
-                {booking.travelFeeCents > 0
-                  ? ` (incl. ${formatMoney(booking.travelFeeCents)} travel fee)`
-                  : ""}
+                {booking.totalCents === 0
+                  ? "Free — no charge"
+                  : `${formatMoney(booking.totalCents)}${
+                      booking.travelFeeCents > 0
+                        ? ` (incl. ${formatMoney(booking.travelFeeCents)} travel fee)`
+                        : ""
+                    }`}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
@@ -86,6 +89,7 @@ export default async function ManageBookingPage({
                   bookingId={booking.id}
                   serviceSlug={service.slug}
                   canCancelOnline={canCancelOnline}
+                  paid={booking.totalCents > 0}
                 />
                 <p className="mt-6 text-sm text-ink-500">{site.cancellation.policy}</p>
               </>

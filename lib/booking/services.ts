@@ -35,7 +35,7 @@ function rowToService(row: ServiceRow): CatalogService {
     slug: row.slug,
     name: row.name,
     priceCents: row.priceCents,
-    priceDisplay: formatCents(row.priceCents),
+    priceDisplay: row.priceCents === 0 ? "Free" : formatCents(row.priceCents),
     kind,
     durationMinutes: row.durationMinutes,
     bufferMinutes: row.bufferMinutes,
