@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <div className="max-w-3xl">
           <p className="eyebrow">Legal</p>
           <h1 className="mt-3 font-serif text-4xl font-semibold text-ink-900">Privacy Policy</h1>
-          <p className="mt-3 text-sm text-ink-500">Effective July 16, 2026</p>
+          <p className="mt-3 text-sm text-ink-500">Effective July 18, 2026</p>
 
           <div className="prose-site mt-8 text-base text-ink-700">
             <p>
@@ -54,11 +54,20 @@ export default function PrivacyPage() {
               reference to the transaction so we can issue refunds under our cancellation policy.
             </p>
             <p>
-              <strong>Text messages (SMS).</strong> If you check the consent box when booking,
-              we send appointment-related texts — confirmations, reminders, and a follow-up
-              after your visit. Reply STOP to any message to stop receiving texts; reply HELP or
-              call us for help. Message and data rates may apply. Consent to texts is not a
-              condition of purchase — you can book without it and we&apos;ll use email only.
+              <strong>Text messages (SMS).</strong> If you select the separate optional consent
+              checkbox when booking or requesting service, Lake Cumberland Computers may send
+              non-marketing customer-care text messages related to your appointment or requested
+              IT services. Messages may include appointment confirmations, reminders, scheduling
+              changes, technician arrival notifications, service updates, requests for
+              information, estimates, repair completion notices, invoice notifications, and
+              responses to support questions. Message frequency varies based on your
+              appointments and service activity. Message and data rates may apply. Consent to
+              receive text messages is not a condition of purchasing or booking a service. Reply
+              STOP to opt out or HELP for assistance. Mobile information, including phone
+              numbers and SMS opt-in data and consent, will not be sold, rented, or shared with
+              third parties or affiliates for marketing or promotional purposes. Information may
+              be provided to service providers solely as necessary to deliver our text messaging
+              service.
             </p>
             <p>
               <strong>Analytics.</strong> We use privacy-friendly analytics to count visits and

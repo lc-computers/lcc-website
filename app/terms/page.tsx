@@ -16,7 +16,7 @@ export default function TermsPage() {
         <div className="max-w-3xl">
           <p className="eyebrow">Legal</p>
           <h1 className="mt-3 font-serif text-4xl font-semibold text-ink-900">Terms of Service</h1>
-          <p className="mt-3 text-sm text-ink-500">Effective July 16, 2026</p>
+          <p className="mt-3 text-sm text-ink-500">Effective July 18, 2026</p>
 
           <div className="prose-site mt-8 text-base text-ink-700">
             <p>
@@ -74,11 +74,17 @@ export default function TermsPage() {
 
             <h2>Text message (SMS) terms</h2>
             <p>
-              Booking includes an optional checkbox consenting to appointment-related text
-              messages: confirmation, a reminder before your visit, and a follow-up after.
-              Consent is not a condition of booking. Message frequency is low; message and data
-              rates may apply. Reply STOP to cancel texts at any time, or HELP for help. We
-              don&apos;t send marketing by text.
+              Customers who voluntarily opt in may receive non-marketing customer-care text
+              messages from Lake Cumberland Computers, a service of Stargel Technologies LLC.
+              Messages may include appointment confirmations, reminders, scheduling changes,
+              technician arrival notifications, service updates, requests for information,
+              estimates, repair completion notices, invoice notifications, and responses to
+              customer questions. Message frequency varies. Message and data rates may apply.
+              Consent is not a condition of purchase. Reply STOP to cancel text messages at any
+              time. Reply HELP for assistance, call {site.phone.display}, or email {site.email}.
+              Wireless carriers are not liable for delayed or undelivered messages. Please
+              review our Privacy Policy at{" "}
+              <a href="/privacy">https://lakecumberlandcomputers.com/privacy</a>.
             </p>
 
             <h2>The chat assistant</h2>
