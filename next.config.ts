@@ -33,6 +33,35 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
+      // --- Old WP theme demo pages (found via Google/DDG site: searches,
+      //     July 2026). Numbered slugs (-01, service-two) are theme demo
+      //     leftovers; siblings included preemptively. ---
+      { source: "/pricing-plans", destination: "/home-services", permanent: true },
+      { source: "/pricing-plan-01", destination: "/home-services", permanent: true },
+      { source: "/pricing-plan-02", destination: "/home-services", permanent: true },
+      { source: "/service-details", destination: "/services", permanent: true },
+      { source: "/service-one", destination: "/services", permanent: true },
+      { source: "/service-two", destination: "/services", permanent: true },
+      { source: "/service-three", destination: "/services", permanent: true },
+      { source: "/it-service", destination: "/services", permanent: true },
+      { source: "/it-service-details", destination: "/services", permanent: true },
+      { source: "/about-01", destination: "/about", permanent: true },
+      { source: "/about-02", destination: "/about", permanent: true },
+      { source: "/why-choose-us", destination: "/about", permanent: true },
+      { source: "/creative-digital-agency", destination: "/services", permanent: true },
+      { source: "/seo", destination: "/services", permanent: true },
+
+      // Old WP theme custom post types (em_* prefixes) — portfolio/demo
+      // content with no equivalent on the new site.
+      { source: "/em_service/:slug*", destination: "/services", permanent: true },
+      { source: "/em_case_study/:slug*", destination: "/services", permanent: true },
+      { source: "/em_brand/:slug*", destination: "/", permanent: true },
+      { source: "/em_portfolio/:slug*", destination: "/", permanent: true },
+
+      // --- Pre-WordPress "Smart Fix" static site (.html pages) ---
+      { source: "/contact.html", destination: "/contact", permanent: true },
+      { source: "/about.html", destination: "/about", permanent: true },
+
       // NOTE: A blanket `/blog/:slug*` -> `/blog` redirect is intentionally
       // OMITTED. The current app serves live posts from `app/blog/[slug]`, so
       // such a rule would shadow every real blog post. Old post URLs that no
