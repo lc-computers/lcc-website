@@ -108,7 +108,7 @@ export function ShareButtons({
       <button type="button" onClick={copyLink} className={itemClass} aria-live="polite">
         {copied ? (
           <>
-            <Check className="h-4 w-4 text-green-600" aria-hidden="true" />
+            <Check className="h-4 w-4 text-brass-600" aria-hidden="true" />
             <span>Copied!</span>
           </>
         ) : (

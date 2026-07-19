@@ -6,23 +6,41 @@ export const alt = "Lake Cumberland Computers";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Cache each post's card so fonts are fetched at most once per slug per day,
+// not on every social-crawler hit (and so a Google Fonts slowdown can't stall
+// generation repeatedly).
+export const revalidate = 86400;
+
+/** fetch with a hard timeout so a slow-but-open connection aborts into the
+ *  caller's catch instead of hanging past the function's maxDuration — a plain
+ *  fetch only rejects on a network error, never on a slow response. */
+async function fetchWithTimeout(url: string, init: RequestInit, ms: number) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
  * Fetch a Google Font as TTF data for satori (the Vercel-documented pattern:
  * request the css2 stylesheet with a UA that gets TTF URLs, then fetch the
- * file). Returns null on any failure so the image falls back to the default
- * bundled font instead of erroring.
+ * file). Returns null on any failure — including a timeout — so the image
+ * falls back to the default bundled font instead of erroring.
  */
 async function loadGoogleFont(family: string, weight: number, text: string) {
   try {
-    const css = await (
-      await fetch(
-        `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&text=${encodeURIComponent(text)}`,
-        { headers: { "User-Agent": "Mozilla/5.0" } }
-      )
-    ).text();
+    const cssRes = await fetchWithTimeout(
+      `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&text=${encodeURIComponent(text)}`,
+      { headers: { "User-Agent": "Mozilla/5.0" } },
+      2500
+    );
+    const css = await cssRes.text();
     const url = css.match(/src: url\((.+?)\) format\('(?:truetype|opentype)'\)/)?.[1];
     if (!url) return null;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url, {}, 2500);
     if (!res.ok) return null;
     return await res.arrayBuffer();
   } catch {
