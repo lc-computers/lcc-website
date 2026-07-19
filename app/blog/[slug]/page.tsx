@@ -7,9 +7,11 @@ import { Container } from "@/components/ui/Container";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { JsonLd } from "@/components/JsonLd";
+import { ShareButtons } from "@/components/blog/ShareButtons";
 import { articleJsonLd } from "@/lib/jsonld";
 import { getPostBySlug, getPublishedPosts } from "@/lib/blog";
 import { formatDate } from "@/lib/format";
+import { site } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +78,13 @@ export default async function BlogPostPage({
         <Container className="py-12 sm:py-16">
           <div className="prose-site max-w-3xl text-base text-ink-700 sm:text-lg">
             <Markdown>{post.contentMd}</Markdown>
+          </div>
+          <div className="mt-10 max-w-3xl border-t border-cream-200 pt-6">
+            <ShareButtons
+              url={`${site.url}/blog/${post.slug}`}
+              title={post.title}
+              slug={post.slug}
+            />
           </div>
         </Container>
       </article>

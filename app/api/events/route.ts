@@ -19,6 +19,7 @@ const ALLOWED = new Set([
   "phone_clicked",
   "chat_opened",
   "book_step_completed",
+  "post_shared",
 ]);
 
 export async function POST(req: Request) {

@@ -7,7 +7,8 @@ export type ConversionEvent =
   | "chat_lead_captured"
   | "booking_paid"
   | "bookings_link_clicked"
-  | "phone_clicked";
+  | "phone_clicked"
+  | "post_shared";
 
 /**
  * Fire a conversion event to Vercel Analytics and our own events table.
