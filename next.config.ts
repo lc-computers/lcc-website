@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
       // --- Legacy static services page ---
       { source: "/services.html", destination: "/services", permanent: true },
 
+      // --- Legacy per-service WordPress pages (from Search Console) ---
+      {
+        source: "/managed-it-services",
+        destination: "/services/managed-it",
+        permanent: true,
+      },
+
       // NOTE: A blanket `/blog/:slug*` -> `/blog` redirect is intentionally
       // OMITTED. The current app serves live posts from `app/blog/[slug]`, so
       // such a rule would shadow every real blog post. Old post URLs that no
